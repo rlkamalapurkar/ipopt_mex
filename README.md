@@ -12,9 +12,9 @@ pacman -S --needed mingw-w64-x86_64-lapack mingw-w64-x86_64-metis
 ```	
 Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app. 
 
-To compile for linux using WSL, install toolchain in WSL
+To compile for linux, install linux toolchain
 ```
-sudo apt-get install gcc g++ gfortran git patch wget pkg-config liblapack-dev libmetis-dev make
+sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libmetis-dev make
 ```
 
 3) Install MUMPS
@@ -24,7 +24,7 @@ cd ThirdParty-Mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="/opt/ipopt"
+../configure --prefix="/home/$USER/ipopt_precompiled"
 make
 sudo make install
 cd ~
@@ -39,7 +39,7 @@ git clone https://github.com/coin-or-tools/ThirdParty-HSL.git
 cd ThirdParty-HSL
 mkdir ./build
 cd build
-../configure --prefix="/opt/ipopt"
+../configure --prefix="/home/$USER/ipopt_precompiled"
 make
 sudo make install
 cd ~
@@ -49,7 +49,7 @@ cd ~
 git clone https://github.com/coin-or/Ipopt.git
 mkdir ./Ipopt/build
 cd Ipopt/build
-~/Ipopt/configure --with-mumps-cflags="-I/opt/ipopt/include/coin-or/mumps" --with-mumps-lflags="-L/opt/ipopt/lib -lcoinmumps" --with-hsl-cflags="-I/opt/ipopt/include/coin-or/hsl" --with-hsl-lflags="-L/opt/ipopt/lib -lcoinhsl" --prefix="/opt/ipopt"
+~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled"
 make
 make test
 ```
@@ -58,31 +58,38 @@ make test
 sudo make install
 cd ~
 ```
-9) Get modified Ipopt MATLAB interface and copy the Ipopt wrapper files to the toolbox directory
+9) Get modified Ipopt MATLAB interface
 ```
 git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-cp -R ~/ipopt_mex/lib/* /opt/ipopt/lib/
-cp -R ~/ipopt_mex/examples /opt/ipopt/examples
 ```
-10) Copy dependencies to the Ipopt folder
-```
-cd /mingw64/bin
-cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /opt/ipopt/bin/
-cd ~
-```
-11) Compile to MATLAB mex file. First, make sure mingw64 is set as the C and C++ compiler.
-```
-setenv('MW_MINGW64_LOC','C:\msys64\mingw64')
-mex -setup 
-mex -setup c++
-```
-Then, run `CompileIpoptMexLib.m`.
+10) Manage dependencies on the target PC
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in `C:\msys64\opt\ipopt`. The toolbox should be portable to any Windows computer. As long as the directories `...\ipopt\bin` and `...\ipopt\lib` are on your MATLAB path, Ipopt should work.
+    - On Windows, copy dependencies to the Ipopt folder
+	```
+	cd /mingw64/bin
+	cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/ipopt_precompiled/bin/
+	cd ~
+	```
+	- On Linux, make sure BLAS and LAPACK are installed 
+	```
+	sudo apt install liblapack-dev libmetis-dev
+	```
+11) Compile to MATLAB mex file. 
 
-Test your setup by running the examples in the `...\ipopt\examples` directory.
+	- On Windows, make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src`) and run
+	```
+	setenv('MW_MINGW64_LOC','C:\msys64\mingw64')
+	mex -setup 
+	mex -setup c++
+	```
+In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
+
+The complete toolbox with MUMPS and HSL linear solvers should now be in the `ipopt_precompiled` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_precompiled` or Linux: `\home\$USER\ipopt_precompiled`). The toolbox should be portable to any Windows computer and any Linux machine that has BLAS and LAPACK installed. As long as the directories `ipopt_precompiled\bin` and `ipopt_precompiled\lib` are on your MATLAB path, Ipopt should work.
+
+Test your setup by running the examples in the `ipopt_precompiled\examples` directory. In MATLAB, navigate to the `ipopt_precompiled` directory and run
 ```
-addpath('C:\msys64\opt\ipopt\lib')
-addpath('C:\msys64\opt\ipopt\bin')
-cd ..\examples
+addpath(fullfile(pwd,'lib'));
+addpath(fullfile(pwd,'bin'));
+cd examples
 test_BartholomewBiggs
+```
