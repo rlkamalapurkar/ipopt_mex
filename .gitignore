@@ -1,0 +1,8 @@
+*.o
+*.mw
+*.DS_Store
+.vscode
+IPOPT-toolbox.mltbx
+/doc
+/coinbrew
+
