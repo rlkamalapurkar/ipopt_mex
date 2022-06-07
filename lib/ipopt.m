@@ -254,5 +254,9 @@ function [x,info] = ipopt( varargin )
     else
       error('IPOPT: No support for architecture %s\n', cmp );
     end
+  elseif isunix
+	[x,info] = ipopt_linux(varargin{:});
+  else
+	error('IPOPT: No support for architecture %s\n', cmp );
   end
 end
