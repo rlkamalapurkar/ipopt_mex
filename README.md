@@ -14,7 +14,7 @@ Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** th
 
 To compile for linux, install linux toolchain
 ```
-sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libmetis-dev make
+sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libblas-dev libmetis-dev make
 ```
 
 3) Install MUMPS
@@ -45,6 +45,7 @@ sudo make install
 cd ~
 ```
 7) Get Ipopt code, compile, build, and test Ipopt
+Windows:
 ```
 git clone https://github.com/coin-or/Ipopt.git
 mkdir ./Ipopt/build
@@ -52,6 +53,11 @@ cd Ipopt/build
 ~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled"
 make
 make test
+```
+Linux: use the configure command
+```
+export ORIGIN='$ORIGIN'
+~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-z,origin" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack "
 ```
 8) Install Ipopt
 ```
