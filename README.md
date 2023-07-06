@@ -26,7 +26,7 @@ mkdir ./build
 cd build
 ../configure --prefix="/home/$USER/ipopt_precompiled"
 make
-sudo make install
+make install
 cd ~
 ```
 4) Get COIN-OR Tools project ThirdParty-HSL
@@ -41,27 +41,28 @@ mkdir ./build
 cd build
 ../configure --prefix="/home/$USER/ipopt_precompiled"
 make
-sudo make install
+make install
 cd ~
 ```
 7) Get Ipopt code, compile, build, and test Ipopt
 Windows:
 ```
 git clone https://github.com/coin-or/Ipopt.git
-mkdir ./Ipopt/build
-cd Ipopt/build
-~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled"
+cd Ipopt
+mkdir ./build
+cd build
+../configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled"
 make
 make test
 ```
-Linux: use the configure command
-```
-export ORIGIN='$ORIGIN'
-~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-z,origin" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack "
+Linux (DOES NOT WORK): use the configure command
+```diff
+- export ORIGIN='$ORIGIN'
+- ~/Ipopt/configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-z,origin" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack "
 ```
 8) Install Ipopt
 ```
-sudo make install
+make install
 cd ~
 ```
 9) Get modified Ipopt MATLAB interface
@@ -76,9 +77,9 @@ git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/ipopt_precompiled/bin/
 	cd ~
 	```
-	- On Linux, make sure BLAS and LAPACK are installed 
-	```
-	sudo apt install liblapack-dev libmetis-dev
+	- On Linux, make sure BLAS and LAPACK are installed (DOES NOT WORK)
+	```diff
+	- sudo apt install liblapack-dev libmetis-dev
 	```
 11) Compile to MATLAB mex file. 
 
