@@ -58,7 +58,10 @@ make test
 Linux: use the configure command
 ```
 export ORIGIN='$ORIGIN'
-../configure --prefix="/home/$USER/ipopt_precompiled" --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,."
+export PREFIX=/home/$USER/ipopt_precompiled
+export LIBDIR=$PREFIX/lib
+export INCLUDEDIR=$PREFIX/include/coin-or
+../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." 
 ```
 8) Install Ipopt
 ```
