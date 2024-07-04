@@ -9,31 +9,47 @@ old_dir = cd(fileparts(which(mfilename)));
 disp('---------------------------------------------------------');
 SRC = ' ./ipopt.cc ./IpoptInterfaceCommon.cc ';
 CMD = [ 'mex -largeArrayDims -Isrc ' SRC ];
-
-if ispc
-    % use ipopt precompiled with mingw64
-    IPOPT_HOME = '..\..\ipopt_precompiled';
-    IPOPT_BIN  = [IPOPT_HOME '\bin'];
-    IPOPT_LIB  = [IPOPT_HOME '\lib'];
-    LIBS = [' -L' IPOPT_LIB ];
-    NAMES = {'ipopt.dll','sipopt.dll'};
-    for kkk=1:length(NAMES)
-      LIBS = [ LIBS, ' -l', NAMES{kkk} ];
-    end
-    CMD = [ CMD ...
-      '-DOS_WIN -I' IPOPT_HOME '\include\coin-or ' ...
-      '-output ' IPOPT_BIN '\ipopt_win ' LIBS ...
-    ];
-	copyfile ..\examples ..\..\ipopt_precompiled\examples
-    copyfile ..\lib ..\..\ipopt_precompiled\lib
+if ismac
+  %
+  % libipopt must be set with:
+  % install_name_tool -id "@loader_path/libipopt.3.dylib" libipopt.3.dylib
+  %
+  HOME = char(java.lang.System.getProperty('user.home'));
+  IPOPT_HOME = [HOME '/Files/Tools/MATLAB/IPOPT'];
+  IPOPT_LIB  = [IPOPT_HOME '/lib'];
+  LIBS = [' -L' IPOPT_LIB ];
+  NAMES = {'ipopt','sipopt'};
+  for lib=1:length(NAMES)
+    LIBS = [ LIBS, ' -l', NAMES{lib} ];
+  end
+  CMD = [ CMD ...
+    '-I' IPOPT_HOME '/include/coin-or '...
+    ' -DOS_MAC -output ' IPOPT_LIB '/ipopt ' LIBS ' '...
+    'LDFLAGS=''$LDFLAGS -Wl,-rpath,. -framework Accelerate -ldl'' ' ...
+    'CXXFLAGS=''$CXXFLAGS -Wall -O2 -g'' ' ...
+  ];
+elseif ispc
+  % use ipopt precompiled with mingw64
+  IPOPT_HOME = '..\..\ipopt_precompiled';
+  IPOPT_LIB  = [IPOPT_HOME '\lib'];
+  LIBS = [' -L' IPOPT_LIB ];
+  NAMES = {'ipopt.dll','sipopt.dll'};
+  for lib=1:length(NAMES)
+    LIBS = [ LIBS, ' -l', NAMES{lib} ];
+  end
+  CMD = [ CMD ...
+    '-DOS_WIN -I' IPOPT_HOME '\include\coin-or ' ...
+    '-output ' IPOPT_LIB '/ipopt ' LIBS ...
+  ];
+  copyfile ..\examples ..\..\ipopt_precompiled\examples
+  copyfile ..\lib ..\..\ipopt_precompiled\lib
 elseif isunix
 	% use ipopt precompiled with gcc
     IPOPT_HOME = '../../ipopt_precompiled';
     IPOPT_LIB = [IPOPT_HOME '/lib'];
-    IPOPT_BIN = [IPOPT_HOME '/bin'];
     CMD = [ CMD ...
     '-I' IPOPT_HOME '/include/coin-or ' ...
-    '-DOS_LINUX -output ' IPOPT_BIN '/ipopt_linux '...
+    '-DOS_LINUX -output ' IPOPT_LIB '/ipopt '...
     'CXXFLAGS=''$CXXFLAGS -Wall -O2 -g'' ' ...
     'LDFLAGS=''$LDFLAGS -static-libgcc -static-libstdc++'' ' ...
     'LINKLIBS=''-L' IPOPT_LIB ' -L$MATLABROOT/bin/$ARCH -Wl,-rpath,$MATLABROOT/bin/$ARCH ' ...
