@@ -24,7 +24,7 @@ cd ThirdParty-Mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="/home/$USER/ipopt_precompiled"
+../configure --prefix="/home/$USER/install"
 make
 make install
 cd ~
@@ -39,7 +39,7 @@ git clone https://github.com/coin-or-tools/ThirdParty-HSL.git
 cd ThirdParty-HSL
 mkdir ./build
 cd build
-../configure --prefix="/home/$USER/ipopt_precompiled"
+../configure --prefix="/home/$USER/install"
 make
 make install
 cd ~
@@ -51,14 +51,14 @@ git clone https://github.com/coin-or/Ipopt.git
 cd Ipopt
 mkdir ./build
 cd build
-../configure --with-mumps-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/ipopt_precompiled/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/ipopt_precompiled/lib -lcoinhsl" --prefix="/home/$USER/ipopt_precompiled"
+../configure --with-mumps-cflags="-I/home/$USER/install/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/install/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/install/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/install/lib -lcoinhsl" --prefix="/home/$USER/install"
 make
 make test
 ```
 Linux: use the configure command
 ```
 export ORIGIN='$ORIGIN'
-export PREFIX=/home/$USER/ipopt_precompiled
+export PREFIX=/home/$USER/install
 export LIBDIR=$PREFIX/lib
 export INCLUDEDIR=$PREFIX/include/coin-or
 ../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." 
@@ -77,8 +77,12 @@ git clone https://github.com/rlkamalapurkar/ipopt_mex.git
     - On Windows, copy dependencies to the Ipopt folder
 	```
 	cd /mingw64/bin
-	cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/ipopt_precompiled/bin/
+	cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/install/bin/
 	cd ~
+	```
+	Also move built libraries to the lib folder
+	```
+	mv ~/install/bin/* ~/install/lib
 	```
 	- On Linux, make sure BLAS and LAPACK are installed (DOES NOT WORK)
 	```diff
@@ -94,9 +98,9 @@ git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
 In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in the `ipopt_precompiled` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_precompiled` or Linux: `\home\$USER\ipopt_precompiled`). The toolbox should be portable to any Windows computer and any Linux machine that has BLAS and LAPACK installed. As long as the directories `ipopt_precompiled\bin` and `ipopt_precompiled\lib` are on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\install` or Linux: `\home\$USER\install`). The toolbox should be portable to any Windows computer. As long as the directories `install\bin` and `install\lib` are on your MATLAB path, Ipopt should work.
 
-Test your setup by running the examples in the `ipopt_precompiled\examples` directory. In MATLAB, navigate to the `ipopt_precompiled` directory and run
+Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
 addpath(fullfile(pwd,'lib'));
 addpath(fullfile(pwd,'bin'));

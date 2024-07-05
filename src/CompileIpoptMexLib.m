@@ -30,7 +30,7 @@ if ismac
   ];
 elseif ispc
   % use ipopt precompiled with mingw64
-  IPOPT_HOME = '..\..\ipopt_precompiled';
+  IPOPT_HOME = '..\..\install';
   IPOPT_LIB  = [IPOPT_HOME '\lib'];
   LIBS = [' -L' IPOPT_LIB ];
   NAMES = {'ipopt.dll','sipopt.dll'};
@@ -41,8 +41,8 @@ elseif ispc
     '-DOS_WIN -I' IPOPT_HOME '\include\coin-or ' ...
     '-output ' IPOPT_LIB '/ipopt ' LIBS ...
   ];
-  copyfile ..\examples ..\..\ipopt_precompiled\examples
-  copyfile ..\lib ..\..\ipopt_precompiled\lib
+  copyfile ..\examples ..\..\install\examples
+  copyfile ..\lib ..\..\install\lib
 elseif isunix
 	% use ipopt precompiled with gcc
     IPOPT_HOME = '../../ipopt_precompiled';
