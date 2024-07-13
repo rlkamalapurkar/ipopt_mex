@@ -53,7 +53,7 @@ git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
 cd hsl
 mkdir ./build
 cd build
-../configure --prefix="$DIR/install"
+../configure --prefix="$DIR/install" --enable-openmp
 make
 make install
 ```
