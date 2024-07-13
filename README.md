@@ -69,7 +69,7 @@ git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	mex -setup 
 	mex -setup c++
 	```
-In MATLAB, navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
+	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 7) Make the installation portable
 ```
 cd $DIR/install/lib
