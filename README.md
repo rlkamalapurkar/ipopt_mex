@@ -1,6 +1,7 @@
 Windows and MacOS relevant parts of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
 
-Instructions to compile Ipopt and the mex file on MacOS arm64. Tested with MacBook Air M3 Sonoma and MATLAB R2024b
+# MacOS arm64. 
+Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 
 0) Save current directory
 ```
@@ -62,8 +63,13 @@ make install
 cd $DIR
 git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 ```
-8) Compile the mex file
-In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
+8) Compile the mex file 
+	- Make sure C and C++ compilers are set up in MATLAB. Navigate to the `ipopt_mex\src` folder and run
+	```
+	mex -setup 
+	mex -setup c++
+	```
+In MATLAB, navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 7) Make the installation portable
 ```
 cd $DIR/install/lib
@@ -76,7 +82,16 @@ Change the name of the library so it can be loaded by Ipopt at runtime
 ```
 cp ./libcoinhsl.dylib ./libhsl.dylib
 ```
-Instructions to compile the mex file on Windows PC. Tested with Windows 11 and MATLAB R2024b
+The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install\lib` is on your MATLAB path, Ipopt should work.
+
+Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
+```
+addpath(fullfile(pwd,'lib'));
+cd examples
+test_BartholomewBiggs
+```
+# Windows x86-64
+Tested with Windows 11 and MATLAB R2024b
 
 1) Install MSYS2 to `C:\msys64`
 2) Install toolchain and compilers
@@ -120,7 +135,6 @@ make install
 cd ~
 ```
 7) Get Ipopt code, compile, build, and test Ipopt
-Windows:
 ```
 git clone https://github.com/coin-or/Ipopt.git
 cd Ipopt
@@ -129,14 +143,6 @@ cd build
 ../configure --with-mumps-cflags="-I/home/$USER/install/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/install/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/install/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/install/lib -lcoinhsl" --prefix="/home/$USER/install"
 make
 make test
-```
-Linux: use the configure command
-```
-export ORIGIN='$ORIGIN'
-export PREFIX=/home/$USER/install
-export LIBDIR=$PREFIX/lib
-export INCLUDEDIR=$PREFIX/include/coin-or
-../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." 
 ```
 8) Install Ipopt
 ```
@@ -148,36 +154,40 @@ cd ~
 git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 ```
 10) Manage dependencies on the target PC
-
-    - On Windows, copy dependencies to the Ipopt folder
-	```
-	cd /mingw64/bin
-	cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/install/bin/
-	cd ~
-	```
-	Also move built libraries to the lib folder
-	```
-	mv ~/install/bin/* ~/install/lib
-	```
-	- On Linux, make sure BLAS and LAPACK are installed (DOES NOT WORK)
-	```diff
-	- sudo apt install liblapack-dev libmetis-dev
-	```
+```
+cd /mingw64/bin
+cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll /home/$USER/install/bin/
+cd ~
+mv ~/install/bin/* ~/install/lib
+```
 11) Compile to MATLAB mex file. 
 
-	- On Windows, make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src`) and run
+	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src`) and run
 	```
 	setenv('MW_MINGW64_LOC','C:\msys64\mingw64')
 	mex -setup 
 	mex -setup c++
 	```
-In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
+	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\install` or Linux: `\home\$USER\install`). The toolbox should be portable to any Windows computer. As long as the directories `install\bin` and `install\lib` are on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS and HSL linear solvers should now be in `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src\install`. The toolbox should be portable to any Windows computer. As long as the directory `install\lib` is on your MATLAB path, Ipopt should work.
 
 Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
 addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
+```
+# Linux (DOES NOT WORK)
+- On Linux, make sure BLAS and LAPACK are installed
+```
+sudo apt install liblapack-dev libmetis-dev
+```
+Linux: use the configure command
+```
+export ORIGIN='$ORIGIN'
+export PREFIX=/home/$USER/install
+export LIBDIR=$PREFIX/lib
+export INCLUDEDIR=$PREFIX/include/coin-or
+../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." 
 ```
