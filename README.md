@@ -178,7 +178,6 @@ The complete toolbox with MUMPS and HSL linear solvers should now be in the `ins
 Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
 addpath(fullfile(pwd,'lib'));
-addpath(fullfile(pwd,'bin'));
 cd examples
 test_BartholomewBiggs
 ```
