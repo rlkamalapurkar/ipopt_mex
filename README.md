@@ -66,12 +66,12 @@ make install
 	cd $DIR
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
-	- Make sure C and C++ compilers are set up in MATLAB. Navigate to the `ipopt_mex\src` folder and run
+	- Make sure C and C++ compilers are set up in MATLAB. Navigate to the `ipopt_mex/src` folder and run
 	```
 	mex -setup 
 	mex -setup c++
 	```
-	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
+	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
 6) Make the installation portable
 	- Adjust install names
 	```
@@ -85,9 +85,9 @@ make install
 	```
 	cp ./libcoinhsl.dylib ./libhsl.dylib
 	```
-The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install\lib` is on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install/lib` is on your MATLAB path, Ipopt should work.
 
-Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
+Test your setup by running the examples in the `install/examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
 addpath(fullfile(pwd,'lib'));
 cd examples
