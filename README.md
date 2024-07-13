@@ -1,6 +1,6 @@
 Windows and MacOS relevant parts of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
 
-# MacOS arm64. 
+# MacOS arm64
 Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 
 0) Save current directory
