@@ -1,10 +1,86 @@
-Windows-relevant parts of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
+Windows and MacOS relevant parts of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
 
-Instructions to compile the mex file on Windows PC. Tested with Windows 11 and MATLAB R2021b
+Instructions to compile Ipopt and the mex file on MacOS arm64. Tested with MacBook Air M3 Sonoma and MATLAB R2024b
+
+0) Save current directory
+```
+DIR=$(pwd)
+```
+
+1) Install toolchain and compilers
+```
+brew update
+brew upgrade
+brew install bash gcc
+brew link --overwrite gcc
+brew install pkg-config
+brew install metis
+``` 
+2) Install MUMPS
+```
+git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
+cd mumps
+./get.Mumps
+mkdir ./build
+cd build
+../configure --prefix="$DIR/install"
+make
+make install
+```
+7) Get Ipopt code, compile, build, and test Ipopt
+```
+cd $DIR
+git clone https://github.com/coin-or/Ipopt.git
+cd Ipopt
+mkdir ./build
+cd build
+../configure --with-mumps-cflags="-I$DIR/install/include/coin-or/mumps" --with-mumps-lflags="-L$DIR/install/lib -lcoinmumps" --prefix="$DIR/install" LDFLAGS="-Wl,-rpath,@loader_path"
+make
+make test
+```
+If all tests pass, compilation is successful, move the binaries in the `install` directory
+```
+make install
+```
+4) Get COIN-OR Tools project ThirdParty-HSL
+```
+cd $DIR
+git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
+```
+5) Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
+6) Configure, build, and install the HSL sources
+```
+cd hsl
+mkdir ./build
+cd build
+../configure --prefix="$DIR/install"
+make
+make install
+```
+Change the name of the library so it can be loaded by Ipopt at runtime
+```
+cd $DIR/install/lib
+mv ./libcoinhsl.dylib ./libhsl.dylib
+```
+7) Make the installation portable
+```
+install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
+install_name_tool -change $DIR/install/lib/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
+install_name_tool -change $DIR/install/lib/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
+install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
+```
+9) Get modified Ipopt MATLAB interface
+```
+cd $DIR
+git clone https://github.com/rlkamalapurkar/ipopt_mex.git
+```
+8) Compile the mex file
+In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
+
+Instructions to compile the mex file on Windows PC. Tested with Windows 11 and MATLAB R2024b
 
 1) Install MSYS2 to `C:\msys64`
 2) Install toolchain and compilers
-
 ```
 pacman -S --needed binutils diffutils git grep make patch pkgconf
 pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran

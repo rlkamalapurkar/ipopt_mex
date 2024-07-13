@@ -14,8 +14,9 @@ if ismac
   % libipopt must be set with:
   % install_name_tool -id "@loader_path/libipopt.3.dylib" libipopt.3.dylib
   %
-  HOME = char(java.lang.System.getProperty('user.home'));
-  IPOPT_HOME = [HOME '/Files/Tools/MATLAB/IPOPT'];
+  %HOME = char(java.lang.System.getProperty('user.home'));
+  %IPOPT_HOME = [HOME '/Files/Tools/MATLAB/IPOPT'];
+  IPOPT_HOME = '../../install';
   IPOPT_LIB  = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
   NAMES = {'ipopt','sipopt'};
@@ -25,9 +26,11 @@ if ismac
   CMD = [ CMD ...
     '-I' IPOPT_HOME '/include/coin-or '...
     ' -DOS_MAC -output ' IPOPT_LIB '/ipopt ' LIBS ' '...
-    'LDFLAGS=''$LDFLAGS -Wl,-rpath,. -framework Accelerate -ldl'' ' ...
+    'LDFLAGS=''$LDFLAGS -Wl,-rpath,. -Wl,-rpath,@loader_path -framework Accelerate -ldl'' ' ...
     'CXXFLAGS=''$CXXFLAGS -Wall -O2 -g'' ' ...
   ];
+  copyfile ../examples/ ../../install/examples
+  copyfile ../lib ../../install/lib
 elseif ispc
   % use ipopt precompiled with mingw64
   IPOPT_HOME = '..\..\install';
