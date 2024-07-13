@@ -3,21 +3,21 @@ Windows and MacOS relevant parts of Enrico Bertolazzi and Peter Carbonetto's MAT
 # MacOS arm64
 Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 
-0) Save current directory
-```
-DIR=$(pwd)
-```
-
-1) Install toolchain and compilers
-```
-brew update
-brew upgrade
-brew install bash gcc
-brew link --overwrite gcc
-brew install pkg-config
-brew install metis
-``` 
-2) Install MUMPS
+1) Set up environment
+	- Save current directory
+	```
+	DIR=$(pwd)
+	```
+	- Install toolchain and compilers
+	```
+	brew update
+	brew upgrade
+	brew install bash gcc
+	brew link --overwrite gcc
+	brew install pkg-config
+	brew install metis
+	``` 
+2) Compile MUMPS
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
@@ -28,60 +28,63 @@ cd build
 make
 make install
 ```
-7) Get Ipopt code, compile, build, and test Ipopt
-```
-cd $DIR
-git clone https://github.com/coin-or/Ipopt.git
-cd Ipopt
-mkdir ./build
-cd build
-../configure --with-mumps-cflags="-I$DIR/install/include/coin-or/mumps" --with-mumps-lflags="-L$DIR/install/lib -lcoinmumps" --prefix="$DIR/install" LDFLAGS="-Wl,-rpath,@loader_path"
-make
-make test
-```
-If all tests pass, compilation is successful, move the binaries in the `install` directory
-```
-make install
-```
-4) Get COIN-OR Tools project ThirdParty-HSL
-```
-cd $DIR
-git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
-```
-5) Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
-6) Configure, build, and install the HSL sources
-```
-cd hsl
-mkdir ./build
-cd build
-../configure --prefix="$DIR/install" --enable-openmp
-make
-make install
-```
-7) Get modified Ipopt MATLAB interface
-```
-cd $DIR
-git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-```
-8) Compile the mex file 
+7) Compile Ipopt
+	- Get Ipopt code, compile, build, and test Ipopt
+	```
+	cd $DIR
+	git clone https://github.com/coin-or/Ipopt.git
+	cd Ipopt
+	mkdir ./build
+	cd build
+	../configure --with-mumps-cflags="-I$DIR/install/include/coin-or/mumps" --with-mumps-lflags="-L$DIR/install/lib -lcoinmumps" --prefix="$DIR/install" LDFLAGS="-Wl,-rpath,@loader_path"
+	make
+	make test
+	```
+	- If all tests pass, compilation is successful, move the binaries in the `install` directory
+	```
+	make install
+	```
+4) Compile HSL
+	- Get COIN-OR Tools project ThirdParty-HSL
+	```
+	cd $DIR
+	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
+	```
+	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
+	- Configure, build, and install the HSL sources
+	```
+	cd hsl
+	mkdir ./build
+	cd build
+	../configure --prefix="$DIR/install" --enable-openmp
+	make
+	make install
+	```
+5) Compile the mex file
+	- Get modified Ipopt MATLAB interface
+	```
+	cd $DIR
+	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
+	```
 	- Make sure C and C++ compilers are set up in MATLAB. Navigate to the `ipopt_mex\src` folder and run
 	```
 	mex -setup 
 	mex -setup c++
 	```
 	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
-7) Make the installation portable
-```
-cd $DIR/install/lib
-install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
-install_name_tool -change $DIR/install/lib/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
-install_name_tool -change $DIR/install/lib/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
-install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
-```
-Change the name of the library so it can be loaded by Ipopt at runtime
-```
-cp ./libcoinhsl.dylib ./libhsl.dylib
-```
+6) Make the installation portable
+	- Adjust install names
+	```
+	cd $DIR/install/lib
+	install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
+	install_name_tool -change $DIR/install/lib/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
+	install_name_tool -change $DIR/install/lib/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
+	install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
+	```
+	- Change the name of the library so it can be loaded by Ipopt at runtime
+	```
+	cp ./libcoinhsl.dylib ./libhsl.dylib
+	```
 The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install\lib` is on your MATLAB path, Ipopt should work.
 
 Test your setup by running the examples in the `install\examples` directory. In MATLAB, navigate to the `install` directory and run
