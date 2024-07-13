@@ -95,22 +95,17 @@ test_BartholomewBiggs
 ```
 # Windows x86-64
 Tested with Windows 11 and MATLAB R2024b
+1) Set up the environment
+	- Install MSYS2 to `C:\msys64`
+	- Install toolchain and compilers
+	```
+	pacman -S --needed binutils diffutils git grep make patch pkgconf
+	pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
+	pacman -S --needed mingw-w64-x86_64-lapack mingw-w64-x86_64-metis
+	```	
+	Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app. 
 
-1) Install MSYS2 to `C:\msys64`
-2) Install toolchain and compilers
-```
-pacman -S --needed binutils diffutils git grep make patch pkgconf
-pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
-pacman -S --needed mingw-w64-x86_64-lapack mingw-w64-x86_64-metis
-```	
-Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app. 
-
-To compile for linux, install linux toolchain
-```
-sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libblas-dev libmetis-dev make
-```
-
-3) Install MUMPS
+3) Compile MUMPS
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git
 cd ThirdParty-Mumps
@@ -122,40 +117,38 @@ make
 make install
 cd ~
 ```
-4) Get COIN-OR Tools project ThirdParty-HSL
-```
-git clone https://github.com/coin-or-tools/ThirdParty-HSL.git
-```
-5) Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `ThirdParty-HSL/coinhsl`.
-6) In ThirdParty-HSL, configure, build, and install the HSL sources
-```
-cd ThirdParty-HSL
-mkdir ./build
-cd build
-../configure --prefix="/home/$USER/install"
-make
-make install
-cd ~
-```
-7) Get Ipopt code, compile, build, and test Ipopt
-```
-git clone https://github.com/coin-or/Ipopt.git
-cd Ipopt
-mkdir ./build
-cd build
-../configure --with-mumps-cflags="-I/home/$USER/install/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/install/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/install/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/install/lib -lcoinhsl" --prefix="/home/$USER/install"
-make
-make test
-```
-8) Install Ipopt
-```
-make install
-cd ~
-```
-9) Get modified Ipopt MATLAB interface
-```
-git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-```
+4) Compile HSL
+	- Get COIN-OR Tools project ThirdParty-HSL
+	```
+	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git
+	```
+	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `ThirdParty-HSL/coinhsl`.
+	- In ThirdParty-HSL, configure, build, and install the HSL sources
+	```
+	cd ThirdParty-HSL
+	mkdir ./build
+	cd build
+	../configure --prefix="/home/$USER/install"
+	make
+	make install
+	cd ~
+	```
+7) Compile Ipopt
+	- Get Ipopt code, compile, build, and test Ipopt
+	```
+	git clone https://github.com/coin-or/Ipopt.git
+	cd Ipopt
+	mkdir ./build
+	cd build
+	../configure --with-mumps-cflags="-I/home/$USER/install/include/coin-or/mumps" --with-mumps-lflags="-L/home/$USER/install/lib -lcoinmumps" --with-hsl-cflags="-I/home/$USER/install/include/coin-or/hsl" --with-hsl-lflags="-L/home/$USER/install/lib -lcoinhsl" --prefix="/home/$USER/install"
+	make
+	make test
+	```
+	- If all tests passed, then install Ipopt
+	```
+	make install
+	cd ~
+	```
 10) Manage dependencies on the target PC
 ```
 cd /mingw64/bin
@@ -163,8 +156,11 @@ cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll l
 cd ~
 mv ~/install/bin/* ~/install/lib
 ```
-11) Compile to MATLAB mex file. 
-
+9) Compile the mex file
+	- Get modified Ipopt MATLAB interface
+	```
+	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
+	```
 	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src`) and run
 	```
 	setenv('MW_MINGW64_LOC','C:\msys64\mingw64')
@@ -182,6 +178,10 @@ cd examples
 test_BartholomewBiggs
 ```
 # Linux (DOES NOT WORK)
+- To compile for linux, install linux toolchain
+	```
+	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libblas-dev libmetis-dev make
+	```
 - On Linux, make sure BLAS and LAPACK are installed
 ```
 sudo apt install liblapack-dev libmetis-dev
