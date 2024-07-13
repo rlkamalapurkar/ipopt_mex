@@ -62,6 +62,13 @@ Change the name of the library so it can be loaded by Ipopt at runtime
 cd $DIR/install/lib
 cp ./libcoinhsl.dylib ./libhsl.dylib
 ```
+7) Get modified Ipopt MATLAB interface
+```
+cd $DIR
+git clone https://github.com/rlkamalapurkar/ipopt_mex.git
+```
+8) Compile the mex file
+In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
 7) Make the installation portable
 ```
 install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
@@ -69,14 +76,6 @@ install_name_tool -change $DIR/install/lib/libsipopt.3.dylib @loader_path/libsip
 install_name_tool -change $DIR/install/lib/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
 install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
 ```
-9) Get modified Ipopt MATLAB interface
-```
-cd $DIR
-git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-```
-8) Compile the mex file
-In MATLAB, navigate to the `ipopt_mex\src` folder (Windows: `C:\msys64\home\YOUR_MSYS2_USER_NAME\ipopt_mex\src` or Linux: `\home\$USER\ipopt_mex\src`) and run `CompileIpoptMexLib.m`.
-
 Instructions to compile the mex file on Windows PC. Tested with Windows 11 and MATLAB R2024b
 
 1) Install MSYS2 to `C:\msys64`
