@@ -60,7 +60,7 @@ make install
 Change the name of the library so it can be loaded by Ipopt at runtime
 ```
 cd $DIR/install/lib
-mv ./libcoinhsl.dylib ./libhsl.dylib
+cp ./libcoinhsl.dylib ./libhsl.dylib
 ```
 7) Make the installation portable
 ```
