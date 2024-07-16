@@ -28,7 +28,7 @@ cd build
 make
 make install
 ```
-7) Compile Ipopt
+3) Compile Ipopt
 	- Get Ipopt code, compile, build, and test Ipopt
 	```
 	cd $DIR
@@ -108,7 +108,7 @@ Tested with Windows 11 and MATLAB R2024b
 	```
  	DIR=$(pwd)
 
-3) Compile MUMPS
+2) Compile MUMPS
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
@@ -119,7 +119,7 @@ cd build
 make
 make install
 ```
-4) Compile HSL
+3) Compile HSL
 	- Get COIN-OR Tools project ThirdParty-HSL
 	```
 	cd $DIR
@@ -135,7 +135,7 @@ make install
 	make
 	make install
 	```
-7) Compile Ipopt
+4) Compile Ipopt
 	- Get Ipopt code, compile, build, and test Ipopt
 	```
  	cd $DIR
@@ -151,14 +151,14 @@ make install
 	```
 	make install
 	```
-10) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder)
+5) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder)
 ```
 cd $MSYSDIR/mingw64/bin
 cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll $DIR/install/lib/
 cd $DIR
 mv $DIR/install/bin/* $DIR/install/lib
 ```
-9) Compile the mex file
+6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
@@ -179,20 +179,60 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux (DOES NOT WORK)
-- To compile for linux, install linux toolchain
+# Linux (MUMPS linear solver only)
+1) Install linux toolchain
 	```
-	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libblas-dev libmetis-dev make
+	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev libmetis-dev make
 	```
-- On Linux, make sure BLAS and LAPACK are installed
+2) Compile MUMPS
 ```
-sudo apt install liblapack-dev libmetis-dev
+DIR=$(pwd)
+git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
+cd mumps
+./get.Mumps
+mkdir ./build
+cd build
+../configure --prefix="$DIR/install"
+make
+make install
 ```
-Linux: use the configure command
+4) Compile Ipopt
+	- Get Ipopt code, compile, build, and test Ipopt
+	```
+ 	cd $DIR
+	git clone https://github.com/coin-or/Ipopt.git
+	cd Ipopt
+	mkdir ./build
+	cd build
+	export ORIGIN='$ORIGIN'
+	export PREFIX=$DIR/install
+	export LIBDIR=$PREFIX/lib
+	export INCLUDEDIR=$PREFIX/include/coin-or
+	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." --with-lapack-lflags="-Wl,--no-as-needed /usr/lib/x86_64-linux-gnu/libopenblas.so -lm"
+	make
+	make test
+	```
+	- If all tests passed, then install Ipopt
+	```
+	make install
+	```
+6) Compile the mex file
+	- Get modified Ipopt MATLAB interface
+	```
+	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
+	```
+	- Make sure mex compilers are set up correctly (gcc and g++)
+	```
+	mex -setup 
+	mex -setup c++
+	```
+	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
+
+**IMPORTANT: On Linux, MATLAB ships its own C++ library which may have a version conflict with the standard library. If you run into issues related to `libstdc++`, launch MATLAB from a terminal by running**
 ```
-export ORIGIN='$ORIGIN'
-export PREFIX=/home/$USER/install
-export LIBDIR=$PREFIX/lib
-export INCLUDEDIR=$PREFIX/include/coin-or
-../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl" --with-lapack-lflags="-L/usr/lib/x86_64-linux-gnu -lblas -llapack" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." 
+export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+matlab
 ```
+**(replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed).**
+
+The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\ipopt_mex\src\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
