@@ -19,18 +19,17 @@ function test_BartholomewBiggs
   options.ipopt.max_iter         = 400;
   options.ipopt.tol              = 1e-10;
 
-  %options.ipopt.linear_solver = 'mumps';
+  options.ipopt.linear_solver = 'mumps';
   % HSL solver family
-  % to use this solvers see README_HSL.md
-  options.ipopt.linear_solver    = 'ma57';
-  %options.ipopt.linear_solver    = 'ma77';
-  %options.ipopt.linear_solver    = 'ma86';
-  %options.ipopt.linear_solver    = 'ma97';
+  % options.ipopt.linear_solver    = 'ma57';
+  % options.ipopt.linear_solver    = 'ma77';
+  % options.ipopt.linear_solver    = 'ma86';
+  % options.ipopt.linear_solver    = 'ma97';
 
   % PARDISO solver
   % to use this solvers see README_HSL.md
-  %options.ipopt.linear_solver    = 'pardiso';
-  %options.ipopt.pardiso_msglvl   = 4;
+  % options.ipopt.linear_solver    = 'pardiso';
+  % options.ipopt.pardiso_msglvl   = 4;
 
   % The callback functions.
   funcs.objective         = @objective;
