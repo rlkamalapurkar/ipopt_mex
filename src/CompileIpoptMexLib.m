@@ -48,7 +48,7 @@ elseif ispc
   copyfile ..\lib ..\..\install\lib
 elseif isunix
 	% use ipopt precompiled with gcc
-    IPOPT_HOME = '../../ipopt_precompiled';
+    IPOPT_HOME = '../../install';
     IPOPT_LIB = [IPOPT_HOME '/lib'];
     CMD = [ CMD ...
     '-I' IPOPT_HOME '/include/coin-or ' ...
