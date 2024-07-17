@@ -179,40 +179,45 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux (DOES NOT WORK)
+# Linux (MUMPS only, no HSL)
+MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Install linux toolchain
 	```
 	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev libmetis-dev make
 	```
-2) Compile MUMPS
+2) Copy the static blas library to the install folder
 ```
 DIR=$(pwd)
+mkdir install
+mkdir install/lib
+cp /usr/lib/x86_64-linux-gnu/libopenblas.a $DIR/install/lib/libopenblas.a
+```
+2) Compile MUMPS as a static library
+```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="$DIR/install"
+../configure --prefix="$DIR/install" -with-lapack-lflags="-Wl,--no-as-needed $DIR/install/lib/libopenblas.a -lm" --disable-shared
 make
 make install
 ```
-4) Compile Ipopt
-	- Get Ipopt code, compile, build, and test Ipopt
+4) Compile Ipopt as a static library
+	- Get Ipopt code, compile, and build Ipopt
 	```
  	cd $DIR
 	git clone https://github.com/coin-or/Ipopt.git
 	cd Ipopt
 	mkdir ./build
 	cd build
-	export ORIGIN='$ORIGIN'
 	export PREFIX=$DIR/install
 	export LIBDIR=$PREFIX/lib
 	export INCLUDEDIR=$PREFIX/include/coin-or
-	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" LDFLAGS="-Wl,-rpath,\$\$ORIGIN -Wl,-rpath,." --with-lapack-lflags="-Wl,--no-as-needed /usr/lib/x86_64-linux-gnu/libopenblas.so -lm"
+	../configure --prefix="$PREFIX" --with-lapack-lflags="-Wl,--no-as-needed $DIR/install/lib/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR/libcoinmumps.a" --disable-shared
 	make
-	make test
 	```
-	- If all tests passed, then install Ipopt
+	- If you rum `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 	```
 	make install
 	```
