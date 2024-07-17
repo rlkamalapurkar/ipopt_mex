@@ -179,7 +179,7 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux (MUMPS linear solver only)
+# Linux (DOES NOT WORK)
 1) Install linux toolchain
 	```
 	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev libmetis-dev make
