@@ -179,7 +179,7 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux (MUMPS only, no HSL)
+# Linux (MUMPS, MA27, MA57, and MA97)
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Install linux toolchain
 	```
@@ -188,22 +188,41 @@ MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-
 2) Copy the static blas library to the install folder
 ```
 DIR=$(pwd)
+export PREFIX=$DIR/install
+export LIBDIR=$PREFIX/lib
+export INCLUDEDIR=$PREFIX/include/coin-or
 mkdir install
 mkdir install/lib
-cp /usr/lib/x86_64-linux-gnu/libopenblas.a $DIR/install/lib/libopenblas.a
+cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 ```
-2) Compile MUMPS as a static library
+3) Compile MUMPS as a static library
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="$DIR/install" -with-lapack-lflags="-Wl,--no-as-needed $DIR/install/lib/libopenblas.a -lm" --disable-shared
+../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
 make
 make install
 ```
-4) Compile Ipopt as a static library
+4) Compile HSL (MA27, MA57, and MA97 work, others cause segmentation faults)
+	- Get COIN-OR Tools project ThirdParty-HSL
+	```
+	cd $DIR
+	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
+	```
+	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
+	- In ThirdParty-HSL, configure, build, and install the HSL sources
+	```
+	cd hsl
+	mkdir ./build
+	cd build
+	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
+	make
+	make install
+	```
+5) Compile Ipopt as a static library
 	- Get Ipopt code, compile, and build Ipopt
 	```
  	cd $DIR
@@ -211,10 +230,7 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	export PREFIX=$DIR/install
-	export LIBDIR=$PREFIX/lib
-	export INCLUDEDIR=$PREFIX/include/coin-or
-	../configure --prefix="$PREFIX" --with-lapack-lflags="-Wl,--no-as-needed $DIR/install/lib/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="-L$LIBDIR/libcoinmumps.a" --disable-shared
+	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a -lgfortran -lm" --disable-shared
 	make
 	```
 	- If you rum `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
