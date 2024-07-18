@@ -62,7 +62,6 @@ make install
 	../configure --prefix="$PREFIX" --enable-openmp
 	make
 	make install
- 	mv $PREFIX/bin/* $LIBDIR
 	```
 5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
@@ -125,6 +124,7 @@ cd build
 ../configure --prefix="$PREFIX"
 make
 make install
+mv $PREFIX/bin/* $LIBDIR
 ```
 3) Compile HSL
 	- Get COIN-OR Tools project ThirdParty-HSL
@@ -141,6 +141,7 @@ make install
 	../configure --prefix="$PREFIX"
 	make
 	make install
+ 	mv $PREFIX/bin/* $LIBDIR
 	```
 4) Compile Ipopt
 	- Get Ipopt code, compile, build, and test Ipopt
