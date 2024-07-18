@@ -238,11 +238,9 @@ make install
 	cd build
 	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a -lgfortran -lm" --disable-shared
 	make
-	```
-	- If you rum `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
-	```
 	make install
 	```
+ 	- If you run `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
