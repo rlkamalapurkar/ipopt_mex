@@ -10,12 +10,7 @@ disp('---------------------------------------------------------');
 SRC = ' ./ipopt.cc ./IpoptInterfaceCommon.cc ';
 CMD = [ 'mex -largeArrayDims -Isrc ' SRC ];
 if ismac
-  %
-  % libipopt must be set with:
-  % install_name_tool -id "@loader_path/libipopt.3.dylib" libipopt.3.dylib
-  %
-  %HOME = char(java.lang.System.getProperty('user.home'));
-  %IPOPT_HOME = [HOME '/Files/Tools/MATLAB/IPOPT'];
+  % use ipopt precompiled with gcc
   IPOPT_HOME = '../../install';
   IPOPT_LIB  = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
