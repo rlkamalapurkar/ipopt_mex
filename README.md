@@ -39,7 +39,7 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/coin-or/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" LDFLAGS="-Wl,-rpath,@loader_path"
+	../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path"
 	make
 	make test
 	```
