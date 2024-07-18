@@ -62,6 +62,7 @@ make install
 	../configure --prefix="$PREFIX" --enable-openmp
 	make
 	make install
+ 	mv $PREFIX/bin/* $LIBDIR
 	```
 5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
