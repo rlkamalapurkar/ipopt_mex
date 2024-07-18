@@ -149,7 +149,7 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/coin-or/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/coin-or/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl"
+	../configure --prefix="$PREFIX"
 	make
 	make test
 	```
