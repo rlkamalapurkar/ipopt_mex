@@ -167,6 +167,7 @@ mv $PREFIX/bin/* $LIBDIR
 6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
+ 	cd $DIR
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
 	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`$DIR\ipopt_mex\src`) and run (replace $MSYSDIR with your MSYS2 installation folder)
@@ -244,6 +245,7 @@ make install
 6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
+ 	cd $DIR
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
 	- Make sure mex compilers are set up correctly (gcc and g++)
