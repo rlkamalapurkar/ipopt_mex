@@ -7,6 +7,9 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 	- Save current directory
 	```
 	DIR=$(pwd)
+ 	export PREFIX=$DIR/install
+	export LIBDIR=$PREFIX/lib
+	export INCLUDEDIR=$PREFIX/include/coin-or
 	```
 	- Install toolchain and compilers
 	```
@@ -24,7 +27,7 @@ cd mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="$DIR/install"
+../configure --prefix="$PREFIX"
 make
 make install
 ```
@@ -36,7 +39,7 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --with-mumps-cflags="-I$DIR/install/include/coin-or/mumps" --with-mumps-lflags="-L$DIR/install/lib -lcoinmumps" --prefix="$DIR/install" LDFLAGS="-Wl,-rpath,@loader_path"
+	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/coin-or/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" LDFLAGS="-Wl,-rpath,@loader_path"
 	make
 	make test
 	```
@@ -56,7 +59,7 @@ make install
 	cd hsl
 	mkdir ./build
 	cd build
-	../configure --prefix="$DIR/install" --enable-openmp
+	../configure --prefix="$PREFIX" --enable-openmp
 	make
 	make install
 	```
@@ -75,11 +78,11 @@ make install
 6) Make the installation portable
 	- Adjust install names
 	```
-	cd $DIR/install/lib
-	install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
-	install_name_tool -change $DIR/install/lib/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
-	install_name_tool -change $DIR/install/lib/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
-	install_name_tool -change $DIR/install/lib/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
+	cd $LIBDIR
+	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
+	install_name_tool -change $LIBDIR/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
+	install_name_tool -change $LIBDIR/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
+	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
 	```
 	- Change the name of the library so it can be loaded by Ipopt at runtime
 	```
@@ -107,6 +110,9 @@ Tested with Windows 11 and MATLAB R2024b
 	- Store current directory
 	```
  	DIR=$(pwd)
+ 	export PREFIX=$DIR/install
+	export LIBDIR=$PREFIX/lib
+	export INCLUDEDIR=$PREFIX/include/coin-or
 
 2) Compile MUMPS
 ```
@@ -115,7 +121,7 @@ cd mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="$DIR/install"
+../configure --prefix="$PREFIX"
 make
 make install
 ```
@@ -131,7 +137,7 @@ make install
 	cd hsl
 	mkdir ./build
 	cd build
-	../configure --prefix="$DIR/install"
+	../configure --prefix="$PREFIX"
 	make
 	make install
 	```
@@ -143,7 +149,7 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --with-mumps-cflags="-I$DIR/install/include/coin-or/mumps" --with-mumps-lflags="-L$DIR/install/lib -lcoinmumps" --with-hsl-cflags="-I$DIR/install/include/coin-or/hsl" --with-hsl-lflags="-L$DIR/install/lib -lcoinhsl" --prefix="$DIR/install"
+	../configure --prefix="$PREFIX" --with-mumps-cflags="-I$INCLUDEDIR/coin-or/mumps" --with-mumps-lflags="-L$LIBDIR -lcoinmumps" --with-hsl-cflags="-I$INCLUDEDIR/coin-or/hsl" --with-hsl-lflags="-L$LIBDIR -lcoinhsl"
 	make
 	make test
 	```
@@ -154,9 +160,9 @@ make install
 5) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder)
 ```
 cd $MSYSDIR/mingw64/bin
-cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll $DIR/install/lib/
+cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll $LIBDIR
 cd $DIR
-mv $DIR/install/bin/* $DIR/install/lib
+mv $PREFIX/bin/* $LIBDIR
 ```
 6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
@@ -171,7 +177,7 @@ mv $DIR/install/bin/* $DIR/install/lib
 	```
 	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\ipopt_mex\src\install`. The toolbox should be portable to any Windows computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\install`. The toolbox should be portable to any Windows computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
 
 Test your setup by running the examples in the `$DIR\install\examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
