@@ -124,7 +124,6 @@ cd build
 ../configure --prefix="$PREFIX"
 make
 make install
-mv $PREFIX/bin/* $LIBDIR
 ```
 3) Compile HSL
 	- Get COIN-OR Tools project ThirdParty-HSL
@@ -141,7 +140,6 @@ mv $PREFIX/bin/* $LIBDIR
 	../configure --prefix="$PREFIX"
 	make
 	make install
- 	mv $PREFIX/bin/* $LIBDIR
 	```
 4) Compile Ipopt
 	- Get Ipopt code, compile, build, and test Ipopt
