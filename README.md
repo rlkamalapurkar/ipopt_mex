@@ -1,4 +1,4 @@
-This is a copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
+This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
 
 # MacOS arm64
 Tested with MacBook Air M3 Sonoma and MATLAB R2024b
