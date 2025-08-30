@@ -126,7 +126,7 @@ make install
 	
 	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib "$LIBDIR"/ipopt.mexmaca64
 	install_name_tool -change $LIBDIR/libsipopt.3.dylib @loader_path/libsipopt.3.dylib "$LIBDIR"/ipopt.mexmaca64
-```
+	```
 The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install/lib` is on your MATLAB path, Ipopt should work.
 
 Test your setup by running the examples in the `install/examples` directory. In MATLAB, navigate to the `install` directory and run
