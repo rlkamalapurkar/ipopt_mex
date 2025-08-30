@@ -63,6 +63,10 @@ make install
 	make
 	make install
 	```
+ 	- Change the name of the library so it can be loaded by Ipopt at runtime
+	```
+	mv $LIBDIR/libcoinhsl.2.dylib $LIBDIR/libhsl.dylib
+	```
 5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
@@ -76,18 +80,53 @@ make install
 	```
 	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
 6) Make the installation portable
-	- Adjust install names
+ 	- Adjust install names and rpaths
 	```
-	cd $LIBDIR
-	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib ipopt.mexmaca64
-	install_name_tool -change $LIBDIR/libsipopt.3.dylib @loader_path/libsipopt.3.dylib ipopt.mexmaca64
-	install_name_tool -change $LIBDIR/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib libipopt.3.dylib
-	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib libsipopt.3.dylib
-	```
-	- Change the name of the library so it can be loaded by Ipopt at runtime
-	```
-	cp ./libcoinhsl.dylib ./libhsl.dylib
-	```
+	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib $LIBDIR
+	cp /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib $LIBDIR
+	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgomp.1.dylib $LIBDIR
+	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgcc_s.1.1.dylib $LIBDIR
+	 
+	install_name_tool -id @rpath/libgfortran.5.dylib $LIBDIR/libgfortran.5.dylib
+	install_name_tool -id @rpath/libquadmath.0.dylib $LIBDIR/libquadmath.0.dylib
+	install_name_tool -id @rpath/libgomp.1.dylib $LIBDIR/libgomp.1.dylib
+	install_name_tool -id @rpath/libgcc_s.1.1.dylib $LIBDIR/libgcc_s.1.1.dylib
+	codesign --force --sign - "$LIBDIR"/libgfortran.5.dylib "$LIBDIR"/libquadmath.0.dylib "$LIBDIR"/libgomp.1.dylib "$LIBDIR"/libgcc_s.1.1.dylib
+	
+	install_name_tool -id @loader_path/libcoinmumps.dylib "$LIBDIR"/libcoinmumps.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libcoinmumps.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libcoinmumps.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc/aarch64-apple-darwin24/15 "$LIBDIR"/libcoinmumps.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc "$LIBDIR"/libcoinmumps.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current "$LIBDIR"/libcoinmumps.dylib
+	
+	install_name_tool -id @loader_path/libipopt.dylib "$LIBDIR"/libipopt.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libipopt.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libipopt.dylib
+	install_name_tool -change $LIBDIR/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib "$LIBDIR"/libipopt.3.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc/aarch64-apple-darwin24/15 "$LIBDIR"/libipopt.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc "$LIBDIR"/libipopt.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current "$LIBDIR"/libipopt.dylib
+	install_name_tool -add_rpath "." $LIBDIR/libipopt.dylib
+	
+	install_name_tool -id @loader_path/libsipopt.dylib "$LIBDIR"/libsipopt.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libsipopt.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libsipopt.dylib
+	install_name_tool -change $LIBDIR/libcoinmumps.3.dylib @loader_path/libcoinmumps.3.dylib "$LIBDIR"/libsipopt.3.dylib
+	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib "$LIBDIR"/libsipopt.dylib
+	install_name_tool -add_rpath "." $LIBDIR/libsipopt.dylib
+	
+	install_name_tool -id @loader_path/libhsl.dylib "$LIBDIR"/libhsl.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libhsl.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libhsl.dylib
+	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgomp.1.dylib @rpath/libgomp.1.dylib "$LIBDIR"/libhsl.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc/aarch64-apple-darwin24/15 "$LIBDIR"/libhsl.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc "$LIBDIR"/libhsl.dylib
+	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current "$LIBDIR"/libhsl.dylib
+	
+	install_name_tool -change $LIBDIR/libipopt.3.dylib @loader_path/libipopt.3.dylib "$LIBDIR"/ipopt.mexmaca64
+	install_name_tool -change $LIBDIR/libsipopt.3.dylib @loader_path/libsipopt.3.dylib "$LIBDIR"/ipopt.mexmaca64
+```
 The complete toolbox with MUMPS and HSL linear solvers should now be in the `install` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `install/lib` is on your MATLAB path, Ipopt should work.
 
 Test your setup by running the examples in the `install/examples` directory. In MATLAB, navigate to the `install` directory and run
