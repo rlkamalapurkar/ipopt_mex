@@ -28,7 +28,6 @@ cd mumps
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX"
-make
 make install
 ```
 3) Compile Ipopt
@@ -40,7 +39,6 @@ make install
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path"
-	make
 	make test
 	```
 	- If all tests pass, compilation is successful, move the binaries in the `install` directory
@@ -60,7 +58,6 @@ make install
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX" --enable-openmp
-	make
 	make install
 	```
  	- Change the name of the library so it can be loaded by Ipopt at runtime
@@ -80,7 +77,7 @@ make install
 	```
 	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
 6) Make the installation portable
- 	- Adjust install names and rpaths
+ 	- Copy dependencies
 	```
 	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib $LIBDIR
 	cp /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib $LIBDIR
@@ -92,7 +89,9 @@ make install
 	install_name_tool -id @rpath/libgomp.1.dylib $LIBDIR/libgomp.1.dylib
 	install_name_tool -id @rpath/libgcc_s.1.1.dylib $LIBDIR/libgcc_s.1.1.dylib
 	codesign --force --sign - "$LIBDIR"/libgfortran.5.dylib "$LIBDIR"/libquadmath.0.dylib "$LIBDIR"/libgomp.1.dylib "$LIBDIR"/libgcc_s.1.1.dylib
-	
+	```
+ 	- Adjust install names and rpaths
+	```
 	install_name_tool -id @loader_path/libcoinmumps.dylib "$LIBDIR"/libcoinmumps.dylib
 	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libcoinmumps.dylib
 	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libcoinmumps.dylib
