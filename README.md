@@ -57,7 +57,7 @@ make install
 	cd hsl
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --enable-openmp
+	../configure --prefix="$PREFIX" --enable-openmp --with-metis-cflags="-I/opt/homebrew/include" --with-metis-lflags="-L/opt/homebrew/lib -lmetis"
 	make install
 	```
  	- Change the name of the library so it can be loaded by Ipopt at runtime
@@ -83,12 +83,14 @@ make install
 	cp /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib $LIBDIR
 	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgomp.1.dylib $LIBDIR
 	cp /opt/homebrew/opt/gcc/lib/gcc/current/libgcc_s.1.1.dylib $LIBDIR
+	cp /opt/homebrew/opt/metis/lib/libmetis.dylib $LIBDIR
 	 
 	install_name_tool -id @rpath/libgfortran.5.dylib $LIBDIR/libgfortran.5.dylib
 	install_name_tool -id @rpath/libquadmath.0.dylib $LIBDIR/libquadmath.0.dylib
 	install_name_tool -id @rpath/libgomp.1.dylib $LIBDIR/libgomp.1.dylib
 	install_name_tool -id @rpath/libgcc_s.1.1.dylib $LIBDIR/libgcc_s.1.1.dylib
-	codesign --force --sign - "$LIBDIR"/libgfortran.5.dylib "$LIBDIR"/libquadmath.0.dylib "$LIBDIR"/libgomp.1.dylib "$LIBDIR"/libgcc_s.1.1.dylib
+	install_name_tool -id @rpath/libmetis.dylib $LIBDIR/libmetis.dylib
+	codesign --force --sign - "$LIBDIR"/libgfortran.5.dylib "$LIBDIR"/libquadmath.0.dylib "$LIBDIR"/libgomp.1.dylib "$LIBDIR"/libgcc_s.1.1.dylib "$LIBDIR"/libmetis.dylib
 	```
  	- Adjust install names and rpaths
 	```
@@ -119,6 +121,7 @@ make install
 	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib @rpath/libquadmath.0.dylib "$LIBDIR"/libhsl.dylib
 	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib @rpath/libgfortran.5.dylib "$LIBDIR"/libhsl.dylib
 	install_name_tool -change /opt/homebrew/opt/gcc/lib/gcc/current/libgomp.1.dylib @rpath/libgomp.1.dylib "$LIBDIR"/libhsl.dylib
+	install_name_tool -change /opt/homebrew/opt/metis/lib/libmetis.dylib @rpath/libmetis.dylib "$LIBDIR"/libhsl.dylib
 	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc/aarch64-apple-darwin24/15 "$LIBDIR"/libhsl.dylib
 	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current/gcc "$LIBDIR"/libhsl.dylib
 	install_name_tool -delete_rpath /opt/homebrew/Cellar/gcc/15.1.0/lib/gcc/current "$LIBDIR"/libhsl.dylib
@@ -160,7 +163,6 @@ cd mumps
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX"
-make
 make install
 ```
 3) Compile HSL
@@ -176,7 +178,6 @@ make install
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX"
-	make
 	make install
 	```
 4) Compile Ipopt
@@ -248,7 +249,6 @@ cd mumps
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
-make
 make install
 ```
 4) Compile HSL (MA27, MA57, and MA97 work, others cause segmentation faults)
@@ -264,7 +264,6 @@ make install
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
-	make
 	make install
 	```
 5) Compile Ipopt as a static library
@@ -276,7 +275,6 @@ make install
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a -lgfortran -lm" --disable-shared
-	make
 	make install
 	```
  	- If you run `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
