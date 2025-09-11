@@ -1,5 +1,11 @@
-This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with MUMPS and HSL linear solvers and detailed compilation instructions.
+This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with **MUMPS** and **HSL** linear solvers and detailed compilation instructions.
 
+**Table of contents:**
+ - [MacOS arm64](#mexmaca64)
+ - [Windows x86-64](#mexw64)
+ - [Linux x86-64](#mexa64)
+
+<a id="mexmaca64"></a>
 # MacOS arm64
 Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 
@@ -137,6 +143,7 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
+<a id="mexw64"></a>
 # Windows x86-64
 Tested with Windows 11 and MATLAB R2024b
 1) Set up the environment
@@ -225,7 +232,8 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux
+<a id="mexa64"></a>
+# Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Install linux toolchain
 ```
@@ -318,4 +326,4 @@ matlab
 ```
 **(replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed).**
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\ipopt_mex\src\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
