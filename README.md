@@ -271,6 +271,7 @@ make install
 ```
 4) Compile MUMPS as a static library
 ```
+cd $DIR
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
 ./get.Mumps
