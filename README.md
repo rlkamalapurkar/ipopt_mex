@@ -322,6 +322,7 @@ make install
 
 **IMPORTANT: On Linux, MATLAB ships its own C++ library which may have a version conflict with the standard library. If you run into issues related to `libstdc++`, launch MATLAB from a terminal by running**
 ```
+cd /usr/local/MATLAB/R2025a/bin
 export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 matlab
 ```
