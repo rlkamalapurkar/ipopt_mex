@@ -324,7 +324,7 @@ make install
 ```
 cd /usr/local/MATLAB/R2025a/bin
 export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
-matlab
+./matlab
 ```
 **(replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed).**
 
