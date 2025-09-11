@@ -225,12 +225,12 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-# Linux (MUMPS, MA27, MA57, and MA97)
+# Linux
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Install linux toolchain
-	```
-	sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev libmetis-dev make
-	```
+```
+sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev make cmake
+```
 2) Copy the static blas library to the install folder
 ```
 DIR=$(pwd)
@@ -241,17 +241,37 @@ mkdir install
 mkdir install/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 ```
-3) Compile MUMPS as a static library
+3) Compile GKlib as a static library
+   - Download GKlib
+	```
+	cd $DIR
+	git clone https://github.com/KarypisLab/GKlib.git gklib
+	cd gklib
+	```
+   - Open `$DIR/gklib/CMakeLists.txt` and if you do not see the line `include(cmake/GKlibSystem.cmake)`, then add it before all other `include` commands. Then, compile using
+	```
+	make config prefix=$PREFIX cc=gcc
+	make install
+	```
+4) Compile metis as a static library
+```
+cd $DIR
+git clone https://github.com/KarypisLab/METIS.git metis
+cd metis
+make config prefix=$PREFIX cc=gcc
+make install
+```
+4) Compile MUMPS as a static library
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
 ./get.Mumps
 mkdir ./build
 cd build
-../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
+../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared --with-metis-lflags="$LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-metis-cflags="-I$PREFIX/include"
 make install
 ```
-4) Compile HSL (MA27, MA57, and MA97 work, others cause segmentation faults)
+5) Compile HSL
 	- Get COIN-OR Tools project ThirdParty-HSL
 	```
 	cd $DIR
@@ -263,10 +283,10 @@ make install
 	cd hsl
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
+	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared --with-metis-lflags="$LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-metis-cflags="-I$PREFIX/include"
 	make install
 	```
-5) Compile Ipopt as a static library
+6) Compile Ipopt as a static library
 	- Get Ipopt code, compile, and build Ipopt
 	```
  	cd $DIR
@@ -274,11 +294,11 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a -lgfortran -lm" --disable-shared
+	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --disable-shared
 	make install
 	```
  	- If you run `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
-6) Compile the mex file
+7) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
  	cd $DIR
