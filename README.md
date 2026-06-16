@@ -60,7 +60,7 @@ make install
 	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
 	```
 	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
-	- Configure, build, and install the HSL sources
+	- Configure, build, and install the HSL sources (*the prefix is different here*)
 	```
 	cd hsl
 	mkdir ./build
