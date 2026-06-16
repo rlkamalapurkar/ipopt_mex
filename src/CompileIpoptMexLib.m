@@ -13,6 +13,7 @@ if ismac
   % use ipopt precompiled with gcc
   IPOPT_HOME = '../../install';
   IPOPT_LIB  = [IPOPT_HOME '/lib'];
+  IPOPT_PKG  = [IPOPT_HOME '/ipopt/lib'];
   LIBS = [' -L' IPOPT_LIB ];
   NAMES = {'ipopt','sipopt'};
   for lib=1:length(NAMES)
@@ -20,12 +21,12 @@ if ismac
   end
   CMD = [ CMD ...
     '-I' IPOPT_HOME '/include/coin-or '...
-    ' -DOS_MAC -output ' IPOPT_LIB '/ipopt ' LIBS ' '...
+    ' -DOS_MAC -output ' IPOPT_PKG '/ipopt ' LIBS ' '...
     'LDFLAGS=''$LDFLAGS -Wl,-rpath,.,-rpath,@loader_path -framework Accelerate -ldl'' ' ...
     'CXXFLAGS=''$CXXFLAGS -Wall -O2 -g'' ' ...
   ];
-  copyfile ../examples/ ../../install/examples
-  copyfile ../lib ../../install/lib
+  copyfile ../examples/ ../../install/ipopt/examples
+  copyfile ../lib ../../install/ipopt/lib
 elseif ispc
   % use ipopt precompiled with mingw64
   IPOPT_HOME = '..\..\install';
