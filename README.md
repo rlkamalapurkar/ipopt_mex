@@ -222,7 +222,7 @@ cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 	git clone https://github.com/KarypisLab/GKlib.git gklib
 	cd gklib
 	```
-   - Open `$DIR/gklib/CMakeLists.txt` and if you do not see the line `include(cmake/GKlibSystem.cmake)`, then add it before all other `include` commands. Then, compile using
+   - Compile using
 	```
 	make config prefix=$PREFIX cc=gcc
 	make install
@@ -232,7 +232,7 @@ cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 cd $DIR
 git clone https://github.com/KarypisLab/METIS.git metis
 cd metis
-make config prefix=$PREFIX cc=gcc
+make config prefix=$PREFIX cc=gcc CFLAGS="-Wno-stringop-overflow"
 make install
 ```
 4) Compile MUMPS as a static library
@@ -272,7 +272,7 @@ make install
 	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --disable-shared
 	make install
 	```
- 	- If you run `make test`, the tests will fail since they are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
+ 	- If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 7) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
