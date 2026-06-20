@@ -278,7 +278,7 @@ cp builddir/libspral.a $LIBDIR/libspral.a
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --disable-shared
+	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm"--disable-shared
 	make install
 	```
  	- If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
