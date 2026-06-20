@@ -203,9 +203,9 @@ test_BartholomewBiggs
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Install linux toolchain
 ```
-sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev make cmake
+sudo apt install gcc g++ gfortran git patch wget pkg-config liblapack-dev libopenblas-dev make cmake hwloc libhwloc-dev meson ninja-build
 ```
-2) Copy the static blas library to the install folder
+2) Set up directories and copy the static blas library to the install folder
 ```
 DIR=$(pwd)
 export PREFIX=$DIR/install
@@ -216,18 +216,14 @@ mkdir install/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 ```
 3) Compile GKlib as a static library
-   - Download GKlib
-	```
-	cd $DIR
-	git clone https://github.com/KarypisLab/GKlib.git gklib
-	cd gklib
-	```
-   - Compile using
-	```
-	make config prefix=$PREFIX cc=gcc
-	make install
-	```
-4) Compile metis as a static library
+```
+cd $DIR
+git clone https://github.com/KarypisLab/GKlib.git gklib
+cd gklib
+make config prefix=$PREFIX cc=gcc
+make install
+```
+4) Compile metis as a static library (compilation without the `-Wno-stringop-overflow` flag fails)
 ```
 cd $DIR
 git clone https://github.com/KarypisLab/METIS.git metis
@@ -245,6 +241,19 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared --with-metis-lflags="$LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-metis-cflags="-I$PREFIX/include"
 make install
+```
+5) Compile SPRAL as a static library. Since we are using static metis and GKlib libraries, we need to include the appropriate compiler flags. Tests and examples are disabled.
+```
+cd $DIR
+git clone https://github.com/ralna/spral.git spral
+cd spral
+export CFLAGS="-I$PREFIX/include"
+export CXXFLAGS="-I$PREFIX/include"
+export LDFLAGS="-L$LIBDIR -lmetis -lGKlib -lm"
+meson setup builddir --prefix="$PREFIX" --default-library=static -Dlibblas=openblas -Dliblapack=openblas -Dtests=false -Dexamples=false
+meson compile -C builddir
+meson install -C builddir
+cp builddir/libspral.a $LIBDIR/libspral.a
 ```
 5) Compile HSL
 	- Get COIN-OR Tools project ThirdParty-HSL
@@ -286,12 +295,13 @@ make install
 	```
 	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 
-**IMPORTANT: On Linux, MATLAB ships its own C++ library which may have a version conflict with the standard library. If you run into issues related to `libstdc++`, launch MATLAB from a terminal by running**
+**IMPORTANT: On Linux, MATLAB ships its own C++ library which may have a version conflict with the standard library. Also, SPRAL needs some environment variables to be set. To use Ipopt, MATLAB must be launched from a terminal by running (replace `/usr/local/MATLAB/R2025a` with your MATLAB installation directory and replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed)**
 ```
 cd /usr/local/MATLAB/R2025a/bin
 export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+export OMP_CANCELLATION=TRUE
+export OMP_PROC_BIND=TRUE
 ./matlab
 ```
-**(replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed).**
 
-The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS, SPRAL, and HSL linear solvers should now be in `$DIR\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.

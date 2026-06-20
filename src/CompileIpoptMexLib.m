@@ -47,8 +47,11 @@ elseif isunix
   IPOPT_HOME = '../../install';
   IPOPT_LIB = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
-  NAMES = {'ipopt','sipopt','coinmumps','coinhsl','openblas','metis',...
-    'GKlib','dl','MatlabDataArray','mx','mex','mat','m','gfortran','gomp'};
+  NAMES = {'ipopt','sipopt',...
+    'coinmumps','openblas','metis','GKlib',...
+    'coinhsl',... % Remove if hsl not available
+    'spral','hwloc',... % Remove if spral not available
+    'dl','MatlabDataArray','mx','mex','mat','m','gfortran','gomp'};
   for lib=1:length(NAMES)
     LIBS = [ LIBS, ' -l', NAMES{lib} ];
   end
