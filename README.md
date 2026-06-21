@@ -119,7 +119,7 @@ Tested with Windows 11 and MATLAB R2024b
 	pacman -S --needed binutils diffutils git grep make patch pkgconf
 	pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
 	pacman -S --needed mingw-w64-x86_64-lapack mingw-w64-x86_64-metis
-        pacman -S --needed mingw-w64-x86_64-meson mingw-w64-x86_64-ninja mingw-w64-x86_64-hwloc
+    pacman -S --needed mingw-w64-x86_64-meson mingw-w64-x86_64-ninja mingw-w64-x86_64-hwloc
 	```	
 	- Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app.
 	- Store current directory
@@ -172,7 +172,7 @@ meson install -C builddir
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
-        make
+    make
 	make test
 	```
 	- If all tests passed, then install Ipopt
