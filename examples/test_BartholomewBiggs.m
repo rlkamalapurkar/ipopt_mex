@@ -25,6 +25,8 @@ function test_BartholomewBiggs
   % options.ipopt.linear_solver    = 'ma77';
   % options.ipopt.linear_solver    = 'ma86';
   % options.ipopt.linear_solver    = 'ma97';
+  % SPRAL solver
+  % options.ipopt.linear_solver = 'spral';
 
   % PARDISO solver
   % to use this solvers see README_HSL.md

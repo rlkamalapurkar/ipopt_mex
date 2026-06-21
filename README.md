@@ -114,11 +114,12 @@ test_BartholomewBiggs
 Tested with Windows 11 and MATLAB R2024b
 1) Set up the environment
 	- Install MSYS2 (In the following, MSYSDIR refers to the folder where MSYS2 is installed)
-	- Install toolchain and compilers
+	- Install toolchain and compilers (meson, ninja, and hwloc are only needed if you are compiling spral)
 	```
 	pacman -S --needed binutils diffutils git grep make patch pkgconf
 	pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
 	pacman -S --needed mingw-w64-x86_64-lapack mingw-w64-x86_64-metis
+        pacman -S --needed mingw-w64-x86_64-meson mingw-w64-x86_64-ninja mingw-w64-x86_64-hwloc
 	```	
 	- Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app.
 	- Store current directory
@@ -138,7 +139,16 @@ cd build
 ../configure --prefix="$PREFIX"
 make install
 ```
-3) Compile HSL
+3) Compile SPRAL (optional)
+```
+cd $DIR
+git clone https://github.com/ralna/spral.git spral
+cd spral
+meson setup builddir --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
+meson compile -C builddir
+meson install -C builddir
+```
+4) Compile HSL (optional)
 	- Get COIN-OR Tools project ThirdParty-HSL
 	```
 	cd $DIR
@@ -153,7 +163,7 @@ make install
 	../configure --prefix="$PREFIX"
 	make install
 	```
-4) Compile Ipopt
+5) Compile Ipopt (remove the spral flags if spral is not being compiled)
 	- Get Ipopt code, compile, build, and test Ipopt
 	```
  	cd $DIR
@@ -161,22 +171,22 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX"
-	make
+	../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
+        make
 	make test
 	```
 	- If all tests passed, then install Ipopt
 	```
 	make install
 	```
-5) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder)
+6) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder, remove libhwloc*.dll if spral is not being compiled)
 ```
 cd $MSYSDIR/mingw64/bin
-cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll $LIBDIR
+cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll  liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll libhwloc*.dll libltdl*.dll $LIBDIR
 cd $DIR
 mv $PREFIX/bin/* $LIBDIR
 ```
-6) Compile the mex file
+7) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
  	cd $DIR
@@ -184,13 +194,19 @@ mv $PREFIX/bin/* $LIBDIR
 	```
 	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`$DIR\ipopt_mex\src`) and run (replace $MSYSDIR with your MSYS2 installation folder)
 	```
-	setenv('MW_MINGW64_LOC',$MSYSDIR\mingw64')
+	setenv('MW_MINGW64_LOC','$MSYSDIR\mingw64')
 	mex -setup 
 	mex -setup c++
 	```
 	- Navigate to the `ipopt_mex\src` folder and run `CompileIpoptMexLib.m`.
 
 The complete toolbox with MUMPS and HSL linear solvers should now be in `$DIR\install`. The toolbox should be portable to any Windows computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
+
+**IMPORTANT: SPRAL's SSIDS solver requires the environment variables `OMP_CANCELLATION` and `OMP_PROC_BIND` to be set to `TRUE` before MATLAB is launched, or it will fail with error flag -53.** On Windows this can be done via the system environment variables dialog, or from within MATLAB before solving with 
+```
+setenv('OMP_CANCELLATION','TRUE'); 
+setenv('OMP_PROC_BIND','TRUE');
+```
 
 Test your setup by running the examples in the `$DIR\install\examples` directory. In MATLAB, navigate to the `install` directory and run
 ```
