@@ -18,7 +18,7 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
     export PKGDIR=$PREFIX/ipopt
 	export INCLUDEDIR=$PREFIX/include/coin-or
 	```
-	- Install toolchain and compilers (
+	- Install toolchain and compilers (meson and ninja are only needed for spral)
 	```
 	brew update
 	brew upgrade
