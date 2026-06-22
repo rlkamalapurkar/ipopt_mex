@@ -124,7 +124,7 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
-** If you see `error flag -53` when using spral, then run**
+**If you see `error flag -53` when using spral, then run**
 ```
 setenv('OMP_CANCELLATION','TRUE'); 
 setenv('OMP_PROC_BIND','TRUE');
