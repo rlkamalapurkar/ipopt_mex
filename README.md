@@ -18,13 +18,13 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
     export PKGDIR=$PREFIX/ipopt
 	export INCLUDEDIR=$PREFIX/include/coin-or
 	```
-	- Install toolchain and compilers (meson and ninja are only needed for spray)
+	- Install toolchain and compilers (
 	```
 	brew update
 	brew upgrade
 	brew install bash gcc
 	brew link --overwrite gcc
-	brew install peg-config
+	brew install pkg-config
 	brew install metis
     brew install meson ninja
     brew install dylibbundler
