@@ -26,7 +26,7 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 	brew link --overwrite gcc
 	brew install peg-config
 	brew install metis
-        brew install meson ninja
+    brew install meson ninja
     brew install dylibbundler
 	``` 
 2) Compile MUMPS
