@@ -38,7 +38,21 @@ cd build
 ../configure --prefix="$PREFIX"
 make install
 ```
-3) Compile Ipopt
+3) Compile SPRAL (optional)
+```
+cd $DIR
+git clone https://github.com/ralna/spral.git spral
+cd spral
+GCC_VER=$(basename $(ls /opt/homebrew/bin/gcc-* | head -n 1) | sed 's/gcc-//')
+export CC="/opt/homebrew/bin/gcc-${GCC_VER}"
+export CXX="/opt/homebrew/bin/g++-${GCC_VER}"
+export FC="/opt/homebrew/bin/gfortran-${GCC_VER}"
+export LDFLAGS="-L/opt/homebrew/lib"
+meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
+meson compile -C build
+meson install -C build
+```
+4) Compile Ipopt (remove the spral flags if spral is not needed)
 	- Get Ipopt code, compile, build, and test Ipopt
 	```
 	cd $DIR
@@ -46,14 +60,14 @@ make install
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path"
+	../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
 	make test
 	```
 	- If all tests pass, compilation is successful, move the binaries in the `install` directory
 	```
 	make install
 	```
-4) Compile HSL
+5) Compile HSL (optional)
 	- Get COIN-OR Tools project ThirdParty-HSL
 	```
 	cd $DIR
@@ -72,7 +86,7 @@ make install
 	```
 	mv $PKGDIR/lib/libcoinhsl.2.dylib $PKGDIR/lib/libhsl.dylib
 	```
-5) Compile the mex file
+6) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
 	cd $DIR
@@ -84,8 +98,8 @@ make install
 	mex -setup c++
 	```
 	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
-6) Make the installation portable
- 	- Use `dylibbundler` to copy dependencies and fix install names
+7) Make the installation portable
+ 	- Use `dylibbundler` to copy dependencies and fix install names (remove `-x libhsl.dylib` if hsl solvers are not compiled)
 	```
  	cd $PKGDIR/lib
 	dylibbundler -b -of -x ipopt.mexmaca64 -x libhsl.dylib -d . -p @loader_path
@@ -109,6 +123,12 @@ addpath(fullfile(pwd,'lib'));
 cd examples
 test_BartholomewBiggs
 ```
+** If you see `error flag -53` when using spral, then run
+```
+setenv('OMP_CANCELLATION','TRUE'); 
+setenv('OMP_PROC_BIND','TRUE');
+```
+before using ipopt.
 <a id="mexw64"></a>
 # Windows x86-64
 Tested with Windows 11 and MATLAB R2024b
