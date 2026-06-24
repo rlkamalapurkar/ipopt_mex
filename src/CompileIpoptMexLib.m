@@ -13,7 +13,7 @@ if ismac
   % use ipopt precompiled with gcc
   IPOPT_HOME = '../../install';
   IPOPT_LIB  = [IPOPT_HOME '/lib'];
-  IPOPT_PKG  = [IPOPT_HOME '/ipopt/lib'];
+  IPOPT_PKG  = '../../ipopt/lib';
   LIBS = [' -L' IPOPT_LIB ];
   NAMES = {'ipopt','sipopt'};
   for lib=1:length(NAMES)
@@ -25,33 +25,28 @@ if ismac
     'LDFLAGS=''$LDFLAGS -Wl,-rpath,.,-rpath,@loader_path -framework Accelerate -ldl'' ' ...
     'CXXFLAGS=''$CXXFLAGS -Wall -O2 -g'' ' ...
   ];
-  copyfile ../examples/ ../../install/ipopt/examples
-  copyfile ../lib ../../install/ipopt/lib
+  copyfile ../examples/ ../../ipopt/examples
+  copyfile ../lib ../../ipopt/lib
 elseif ispc
   % use ipopt precompiled with mingw64
   IPOPT_HOME = '..\..\install';
-  IPOPT_LIB  = [IPOPT_HOME '\lib'];
-  LIBS = [' -L' IPOPT_LIB ];
+  IPOPT_PKG  = '..\..\ipopt\lib';
+  LIBS = [' -L' IPOPT_PKG ];
   NAMES = {'ipopt.dll','sipopt.dll'};
   for lib=1:length(NAMES)
     LIBS = [ LIBS, ' -l', NAMES{lib} ];
   end
   CMD = [ CMD ...
     '-DOS_WIN -I' IPOPT_HOME '\include\coin-or ' ...
-    '-output ' IPOPT_LIB '/ipopt ' LIBS ...
+    '-output ' IPOPT_PKG '/ipopt ' LIBS ...
   ];
-  copyfile ..\examples ..\..\install\examples
-  copyfile ..\lib ..\..\install\lib
+  copyfile ..\examples ..\..\ipopt\examples
+  copyfile ..\lib ..\..\ipopt\lib
 elseif isunix
   % use ipopt precompiled with gcc
   IPOPT_HOME = '../../install';
   IPOPT_LIB = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
-  % NAMES = {'ipopt','sipopt',...
-  %   'coinmumps','openblas','metis','GKlib',...
-  %  'coinhsl',... % Remove if hsl not available
-  %  'spral','hwloc',... % Remove if spral not available
-  %  'dl','MatlabDataArray','mx','mex','mat','m','gfortran','gomp'};
   NAMES = {'ipopt', 'sipopt'};
   needs_metis = false;
   if ~isempty(dir(fullfile(IPOPT_LIB, 'libcoinmumps.*')))
@@ -60,7 +55,6 @@ elseif isunix
   end
   if ~isempty(dir(fullfile(IPOPT_LIB, 'libcoinhsl.*')))
     NAMES = [NAMES, {'coinhsl'}];
-    % ThirdParty-HSL typically links Metis if available
     needs_metis = true; 
   end
   if ~isempty(dir(fullfile(IPOPT_LIB, 'libspral.*')))
