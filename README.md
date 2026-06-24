@@ -260,7 +260,7 @@ setenv('OMP_CANCELLATION','TRUE');
 setenv('OMP_PROC_BIND','TRUE');
 ```
 
-Test your setup by running the examples in the `$DIR\install\examples` directory. In MATLAB, navigate to the `install` directory and run
+Test your setup by running the examples in the `$DIR\install\examples` directory. In MATLAB, navigate to the `install` directory and run (do not forget to add `options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');` to `test_BartholomewBiggs` if you built IPOPT to use the `ma57` solver that ships with MATLAB.
 ```
 addpath(fullfile(pwd,'lib'));
 cd examples
