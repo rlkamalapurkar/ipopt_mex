@@ -157,32 +157,52 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
     brew install meson ninja
     brew install dylibbundler
 	```
-**At least one linear solver is needed to use IPOPT**
 
-2) Compile MUMPS (optional)
-```
-git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
-cd mumps
-./get.Mumps
-mkdir ./build
-cd build
-../configure --prefix="$PREFIX"
-make install
-```
-3) Compile SPRAL (optional)
-```
-cd $DIR
-git clone https://github.com/ralna/spral.git spral
-cd spral
-GCC_VER=$(basename $(ls /opt/homebrew/bin/gcc-* | head -n 1) | sed 's/gcc-//')
-export CC="/opt/homebrew/bin/gcc-${GCC_VER}"
-export CXX="/opt/homebrew/bin/g++-${GCC_VER}"
-export FC="/opt/homebrew/bin/gfortran-${GCC_VER}"
-export LDFLAGS="-L/opt/homebrew/lib"
-meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
-meson compile -C build
-meson install -C build
-```
+2) Compile linear solvers (need at least one)
+	- MUMPS
+	```
+	git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
+	cd mumps
+	./get.Mumps
+	mkdir ./build
+	cd build
+	../configure --prefix="$PREFIX"
+	make install
+	```
+	- SPRAL
+	```
+	cd $DIR
+	git clone https://github.com/ralna/spral.git spral
+	cd spral
+	GCC_VER=$(basename $(ls /opt/homebrew/bin/gcc-* | head -n 1) | sed 's/gcc-//')
+	export CC="/opt/homebrew/bin/gcc-${GCC_VER}"
+	export CXX="/opt/homebrew/bin/g++-${GCC_VER}"
+	export FC="/opt/homebrew/bin/gfortran-${GCC_VER}"
+	export LDFLAGS="-L/opt/homebrew/lib"
+	meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
+	meson compile -C build
+	meson install -C build
+	```
+	- HSL
+		- Get COIN-OR Tools project ThirdParty-HSL
+		```
+		cd $DIR
+		git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
+		```
+		- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
+		- Configure, build, and install the HSL sources (*the prefix is different here*)
+		```
+		cd hsl
+		mkdir ./build
+		cd build
+		../configure --prefix="$PKGDIR" --enable-openmp --with-metis-cflags="-I/opt/homebrew/include" --with-metis-lflags="-L/opt/homebrew/lib -lmetis"
+		make install
+		```
+		- Change the name of the library so it can be loaded by Ipopt at runtime
+		```
+		mv $PKGDIR/lib/libcoinhsl.2.dylib $PKGDIR/lib/libhsl.dylib
+		```
+
 4) Compile Ipopt (remove the SPRAL flags if SPRAL is not needed)
 ```
 cd $DIR
@@ -193,26 +213,7 @@ cd build
 ../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
 make install
 ```
-5) Compile HSL (optional)
-	- Get COIN-OR Tools project ThirdParty-HSL
-	```
-	cd $DIR
-	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
-	```
-	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
-	- Configure, build, and install the HSL sources (*the prefix is different here*)
-	```
-	cd hsl
-	mkdir ./build
-	cd build
-	../configure --prefix="$PKGDIR" --enable-openmp --with-metis-cflags="-I/opt/homebrew/include" --with-metis-lflags="-L/opt/homebrew/lib -lmetis"
-	make install
-	```
- 	- Change the name of the library so it can be loaded by Ipopt at runtime
-	```
-	mv $PKGDIR/lib/libcoinhsl.2.dylib $PKGDIR/lib/libhsl.dylib
-	```
-6) Compile the mex file
+5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
 	cd $DIR
@@ -267,41 +268,42 @@ in MATLAB before using IPOPT.
  	```
 **You will either need to compile at least one linear solver from the three options below (MUMPS, SPRAL, and HSL) or enable the use of the `ma57` solver shipped with MATLAB by compiling IPOPT with the `-DFUNNY_MA57_FINT -O3` flag (see step 5 below).**
 
-2) Compile MUMPS (optional)
-```
-git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
-cd mumps
-./get.Mumps
-mkdir ./build
-cd build
-../configure --prefix="$PREFIX"
-make install
-```
-3) Compile SPRAL (optional)
-```
-cd $DIR
-git clone https://github.com/ralna/spral.git spral
-cd spral
-meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
-meson compile -C build
-meson install -C build
-```
-4) Compile HSL (optional)
-	- Get COIN-OR Tools project ThirdParty-HSL
+2) Compile linear solvers (need at least one)
+	- Mumps
 	```
-	cd $DIR
-	git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
-	```
-	- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
-	- In ThirdParty-HSL, configure, build, and install the HSL sources
-	```
-	cd hsl
+	git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
+	cd mumps
+	./get.Mumps
 	mkdir ./build
 	cd build
 	../configure --prefix="$PREFIX"
 	make install
 	```
-5) Compile Ipopt (remove the SPRAL flags if not needed)
+	- SPRAL
+	```
+	cd $DIR
+	git clone https://github.com/ralna/spral.git spral
+	cd spral
+	meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
+	meson compile -C build
+	meson install -C build
+	```
+	- HSL
+		- Get COIN-OR Tools project ThirdParty-HSL
+		```
+		cd $DIR
+		git clone https://github.com/coin-or-tools/ThirdParty-HSL.git hsl
+		```
+		- Download Coin-HSL Full from https://www.hsl.rl.ac.uk/ipopt/ and unpack the HSL sources archive, move and rename the resulting directory so that it becomes `hsl/coinhsl`.
+		- In ThirdParty-HSL, configure, build, and install the HSL sources
+		```
+		cd hsl
+		mkdir ./build
+		cd build
+		../configure --prefix="$PREFIX"
+		make install
+		```
+3) Compile Ipopt (remove the SPRAL flags if not needed)
 ```
 cd $DIR
 git clone https://github.com/coin-or/Ipopt.git Ipopt_src
@@ -311,7 +313,7 @@ cd build
 ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
 make install
 ```
-7) Make the package portable
+4) Make the package portable
 ```
 cd $DIR
 mkdir $PKGDIR
@@ -324,7 +326,7 @@ for dll in $PKGDIR/lib/*.dll; do
 	done
 done
 ```
-7) Compile the mex file
+5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
  	cd $DIR
@@ -340,12 +342,6 @@ done
 
 The complete toolbox with MUMPS, SPRAL, and HSL linear solvers should now be in `$DIR\ipopt`. The toolbox should be portable to any Windows computer. As long as the directory `$DIR\ipopt\lib` is on your MATLAB path, Ipopt should work.
 
-**IMPORTANT: SPRAL's SSIDS solver requires the environment variables `OMP_CANCELLATION` and `OMP_PROC_BIND` to be set to `TRUE` before MATLAB is launched, or it will fail with error flag -53.** On Windows this can be done via the system environment variables dialog, or from within MATLAB before solving with 
-```
-setenv('OMP_CANCELLATION','TRUE'); 
-setenv('OMP_PROC_BIND','TRUE');
-```
-
 Test your setup by running the examples in the `$DIR/ipopt/examples` directory. **If you see `error flag -53` when using SPRAL, then run**
 ```
 setenv('OMP_CANCELLATION','TRUE'); 
@@ -356,22 +352,23 @@ in MATLAB before using IPOPT.
 <a id="mexa64"></a>
 # Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
-1) Install linux toolchain (hwloc, meson, and ninja are only needed for SPRAL)
-```
-sudo apt install gcc g++ gfortran git patch wget pkg-config libopenblas-dev make cmake
-sudo apt install hwloc libhwloc-dev meson ninja-build
-```
-2) Set up directories and copy the static blas library to the install folder
-```
-DIR=$(pwd)
-export PREFIX=$DIR/install
-export LIBDIR=$PREFIX/lib
-export INCLUDEDIR=$PREFIX/include/coin-or
-mkdir install
-mkdir install/lib
-cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
-```
-3) Compile linear solvers (need atleast one)
+1) Set up the environment 
+	- Install the toolchain (hwloc, meson, and ninja are only needed for SPRAL)
+	```
+	sudo apt install gcc g++ gfortran git patch wget pkg-config libopenblas-dev make cmake
+	sudo apt install hwloc libhwloc-dev meson ninja-build
+	```
+	- Set up directories and copy the static blas library to the install folder
+	```
+	DIR=$(pwd)
+	export PREFIX=$DIR/install
+	export LIBDIR=$PREFIX/lib
+	export INCLUDEDIR=$PREFIX/include/coin-or
+	mkdir install
+	mkdir install/lib
+	cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
+	```
+2) Compile linear solvers (need atleast one)
     - Compile GKlib as a static library
     ```
     cd $DIR
@@ -429,7 +426,7 @@ cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 	    make install
 	    ```
 
-4) Compile Ipopt as a static library (the lapack flag is always needed and flags for linear solvers that you did not compile need to be removed)
+3) Compile Ipopt as a static library (the lapack flag is always needed and flags for linear solvers that you did not compile need to be removed)
 ```
 cd $DIR
 git clone https://github.com/coin-or/Ipopt.git
@@ -441,7 +438,7 @@ make install
 ```
 If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 
-5) Compile the mex file
+4) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
  	cd $DIR
