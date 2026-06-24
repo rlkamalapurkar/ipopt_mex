@@ -27,8 +27,8 @@ brew upgrade
 brew install bash gcc pkg-config dylibbundler
 brew link --overwrite gcc
 git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-cd Ipopt_src
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" LDFLAGS="-Wl,-rpath,@loader_path"
@@ -72,8 +72,8 @@ export PREFIX=$DIR/install
 export LIBDIR=$PREFIX/lib
 export PKGDIR=$DIR/ipopt
 git clone https://github.com/rlkamalapurkar/ipopt_mex.git
-git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-cd Ipopt_src
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3"
@@ -115,8 +115,8 @@ export INCLUDEDIR=$PREFIX/include/coin-or
 mkdir install
 mkdir install/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
-git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-cd Ipopt_src
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
@@ -206,8 +206,8 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 4) Compile Ipopt (remove the SPRAL flags if SPRAL is not needed)
 ```
 cd $DIR
-git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-cd Ipopt_src
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
@@ -306,8 +306,8 @@ in MATLAB before using IPOPT.
 3) Compile Ipopt (remove the SPRAL flags if not needed)
 ```
 cd $DIR
-git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-cd Ipopt_src
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
@@ -429,8 +429,8 @@ MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-
 3) Compile Ipopt as a static library (the lapack flag is always needed and flags for linear solvers that you did not compile need to be removed)
 ```
 cd $DIR
-git clone https://github.com/coin-or/Ipopt.git
-cd Ipopt
+git clone https://github.com/coin-or/Ipopt.git ipopt_src
+cd ipopt_src
 mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
