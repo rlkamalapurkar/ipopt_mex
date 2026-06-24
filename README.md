@@ -185,14 +185,34 @@ meson install -C build
 	make install
 	```
 5) Compile Ipopt (remove the spral flags if spral is not being compiled)
-	- Get Ipopt code, compile, build, and test Ipopt
+	- Get Ipopt code
 	```
  	cd $DIR
 	git clone https://github.com/coin-or/Ipopt.git
 	cd Ipopt
 	mkdir ./build
 	cd build
-	../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
+    ```
+    - Configure IPOPT
+      - with MUMPS (if compiled) and dynamically loaded `libhsl.dll` at runtime (if available)
+      ```
+      ../configure --prefix="$PREFIX"
+      ```
+      - with MUMPS (if compiled), SPRAL and dynamically loaded `libhsl.dll` at runtime (if available)
+      ```
+	  ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
+      ```
+      - with MUMPS (if compiled) and dynamically loaded `libmwma57.dll` (MA57 solver that ships with MATLAB) (add SPRAL flags from above if SPRAL is needed)
+      ```
+      ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3"
+      ```
+	  **If you use this option, you need to point IPOPT to `libmwma57.dll` using (in your MATLAB script)**
+      ```
+ 	  options.ipopt.linear_solver = 'ma57';
+      options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');
+      ```
+    - Make and test IPOPT
+    ```
     make
 	make test
 	```
@@ -200,20 +220,27 @@ meson install -C build
 	```
 	make install
 	```
-6) Manage dependencies on the target PC (replace $MSYSDIR with your MSYS2 installation folder, remove libhwloc*.dll if spral is not being compiled)
-```
-cd $MSYSDIR/mingw64/bin
-cp libblas*.dll libgcc_s_seh*.dll libgfortran*.dll libgomp*.dll  liblapack*.dll libmetis*.dll libquadmath*.dll libstdc++*.dll libwinpthread*.dll libhwloc*.dll libltdl*.dll $LIBDIR
-cd $DIR
-mv $PREFIX/bin/* $LIBDIR
-```
+7) Manage dependencies on the target PC
+    - Move the compiled binaries from PREFIX to LIBDIR
+    ```
+    cd $DIR
+    mv $PREFIX/bin/* $LIBDIR
+    ```
+    - Automatically find and copy all MinGW-w64 dependencies
+    ```
+    for dll in $LIBDIR/*.dll; do
+        ldd "$dll" | grep -i "/mingw64/bin" | awk '{print $3}' | while read -r dep_path; do
+            cp -n "$dep_path" "$LIBDIR/"
+        done
+    done
+    ```
 7) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
  	cd $DIR
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
-	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`$DIR\ipopt_mex\src`) and run (replace $MSYSDIR with your MSYS2 installation folder)
+	- Make sure mingw64 is set as the C and C++ compiler. In MATLAB, navigate to the `ipopt_mex\src` folder (`$DIR\ipopt_mex\src`) and run (**replace $MSYSDIR with your MSYS2 installation folder**)
 	```
 	setenv('MW_MINGW64_LOC','$MSYSDIR\mingw64')
 	mex -setup 
