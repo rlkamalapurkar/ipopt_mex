@@ -188,7 +188,7 @@ meson install -C build
 	../configure --prefix="$PREFIX"
 	make install
 	```
-5) Compile Ipopt (remove the spral flags if spral is not being compiled)
+5) Compile Ipopt
 	- Get Ipopt code
 	```
  	cd $DIR
