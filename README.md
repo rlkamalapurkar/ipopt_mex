@@ -28,8 +28,10 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 	brew install metis
     brew install meson ninja
     brew install dylibbundler
-	``` 
-2) Compile MUMPS
+	```
+**You will need to compile at least one linear solver from the three options below (MUMPS, SPRAL, and HSL).**
+
+2) Compile MUMPS (optional)
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
@@ -150,7 +152,9 @@ Tested with Windows 11 and MATLAB R2024b
 	export LIBDIR=$PREFIX/lib
 	export INCLUDEDIR=$PREFIX/include/coin-or
  	```
-2) Compile MUMPS
+**You will either need to compile at least one linear solver from the three options below (MUMPS, SPRAL, and HSL) or enable the use of the `ma57` solver shipped with MATLAB by compiling IPOPT with the `-DFUNNY_MA57_FINT -O3` flag (see step 5 below).**
+
+2) Compile MUMPS (optional)
 ```
 git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git mumps
 cd mumps
