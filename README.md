@@ -107,6 +107,7 @@ options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');
 <a id="mexa64min"></a>
 # Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
+1) Set up the toolchain and compile IPOPT
 ```
 sudo apt install gcc g++ gfortran git patch wget pkg-config libopenblas-dev make cmake
 DIR=$(pwd)
@@ -123,7 +124,11 @@ cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
 make install
 ```
-**In your MATLAB script before calling the solver, point IPOPT to the `ma57` solver that ships with MATLAB.**
+2) Compile the mex file in MATLAB
+	- Make sure C and C++ compilers are set up in MATLAB using `mex -setup` and `mex -setup c++`.
+	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
+
+**Point IPOPT to the `ma57` solver that ships with MATLAB when you set IPOPT options.**
 ```
 options.ipopt.linear_solver = 'ma57';
 options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'glnxa64', 'libmwma57.so');
