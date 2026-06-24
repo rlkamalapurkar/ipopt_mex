@@ -165,9 +165,9 @@ make install
 cd $DIR
 git clone https://github.com/ralna/spral.git spral
 cd spral
-meson setup builddir --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
-meson compile -C builddir
-meson install -C builddir
+meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
+meson compile -C build
+meson install -C build
 ```
 4) Compile HSL (optional)
 	- Get COIN-OR Tools project ThirdParty-HSL
