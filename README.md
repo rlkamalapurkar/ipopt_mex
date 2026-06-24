@@ -109,7 +109,7 @@ MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-
 ```
 sudo apt install gcc g++ gfortran git patch wget pkg-config libopenblas-dev make cmake
 DIR=$(pwd)
-export PREFIX=$DIR/ipopt
+export PREFIX=$DIR/install
 export LIBDIR=$PREFIX/lib
 export INCLUDEDIR=$PREFIX/include/coin-or
 mkdir install
@@ -127,11 +127,16 @@ make install
 options.ipopt.linear_solver = 'ma57';
 options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'glnxa64', 'libmwma57.so');
 ```
+**IMPORTANT: On Linux, MATLAB ships its own C++ library which may have a version conflict with the standard library. To use Ipopt, MATLAB must be launched from a terminal by running (replace `/usr/local/MATLAB/R2025a` with your MATLAB installation directory, replace `/usr/lib/x86_64-linux-gnu/` by the appropriate standard library path if needed)**
+```
+cd /usr/local/MATLAB/R2025a/bin
+export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+./matlab
+```
 
 # IPOPT with additional linear solvers (MUMPS, SPRAL, and HSL)
 <a id="mexmaca64"></a>
 ## MacOS arm64
-Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 
 1) Set up environment
 	- Save current directory
@@ -141,7 +146,7 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
 	export LIBDIR=$PREFIX/lib
     export PKGDIR=$PREFIX/ipopt
 	```
-	- Install toolchain and compilers (meson and ninja are only needed for spral)
+	- Install toolchain and compilers (meson and ninja are only needed for SPRAL)
 	```
 	brew update
 	brew upgrade
@@ -152,7 +157,7 @@ Tested with MacBook Air M3 Sonoma and MATLAB R2024b
     brew install meson ninja
     brew install dylibbundler
 	```
-**You will need to compile at least one linear solver from the three options below (MUMPS, SPRAL, and HSL).**
+**At least one linear solver is needed to use IPOPT**
 
 2) Compile MUMPS (optional)
 ```
@@ -178,21 +183,16 @@ meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dl
 meson compile -C build
 meson install -C build
 ```
-4) Compile Ipopt (remove the spral flags if spral is not needed)
-	- Get Ipopt code, compile, build, and test Ipopt
-	```
-	cd $DIR
-	git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-	cd Ipopt_src
-	mkdir ./build
-	cd build
-	../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
-	make test
-	```
-	- If all tests pass, compilation is successful, move the binaries in the `install` directory
-	```
-	make install
-	```
+4) Compile Ipopt (remove the SPRAL flags if SPRAL is not needed)
+```
+cd $DIR
+git clone https://github.com/coin-or/Ipopt.git Ipopt_src
+cd Ipopt_src
+mkdir ./build
+cd build
+../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
+make install
+```
 5) Compile HSL (optional)
 	- Get COIN-OR Tools project ThirdParty-HSL
 	```
@@ -218,50 +218,39 @@ meson install -C build
 	cd $DIR
 	git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 	```
-	- Make sure C and C++ compilers are set up in MATLAB. Navigate to the `ipopt_mex/src` folder and run
+	- Make sure C and C++ compilers are set up in MATLAB.
 	```
 	mex -setup 
 	mex -setup c++
 	```
 	- Navigate to the `ipopt_mex/src` folder and run `CompileIpoptMexLib.m`.
-7) Make the installation portable
- 	- Use `dylibbundler` to copy dependencies and fix install names (remove `-x libhsl.dylib` if hsl solvers are not compiled)
-	```
- 	cd $PKGDIR/lib
-	dylibbundler -b -of -x ipopt.mexmaca64 -x libhsl.dylib -d . -p @loader_path
-	```
- 	- Fix multiple `@loader_path` entries added by `dylibbundler`
-	```
-	for file in *.dylib *.mexmaca64; do
-        rpath_count=$(otool -l "$file" | grep -c "path @loader_path")
-        while [ "$rpath_count" -gt 1 ]; do
-            install_name_tool -delete_rpath @loader_path/ "$file" 2>/dev/null || install_name_tool -delete_rpath @loader_path "$file" 2>/dev/null
-            rpath_count=$((rpath_count - 1))
-        done
-        codesign --force --sign - "$file"
-    done
-	```
+7) Make the package portable (remove `-x libhsl.dylib` if HSL solvers are not compiled) (the for loop fixes multiple `@loader_path` entries added by `dylibbundler`)
+```
+cd $PKGDIR/lib
+dylibbundler -b -of -x ipopt.mexmaca64 -x libhsl.dylib -d . -p @loader_path
+for file in *.dylib *.mexmaca64; do
+	rpath_count=$(otool -l "$file" | grep -c "path @loader_path")
+	while [ "$rpath_count" -gt 1 ]; do
+		install_name_tool -delete_rpath @loader_path/ "$file" 2>/dev/null || install_name_tool -delete_rpath @loader_path "$file" 2>/dev/null
+		rpath_count=$((rpath_count - 1))
+	done
+	codesign --force --sign - "$file"
+done
+```
 The complete toolbox with MUMPS, SPRAL, and HSL linear solvers should now be in the `$DIR/ipopt` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `$DIR/ipopt/lib` is on your MATLAB path, Ipopt should work.
 
-Test your setup by running the examples in the `$DIR/ipopt/examples` directory. In MATLAB, navigate to the `$DIR/ipopt` directory and run
-```
-addpath(fullfile(pwd,'lib'));
-cd examples
-test_BartholomewBiggs
-```
-**If you see `error flag -53` when using spral, then run**
+Test your setup by running the examples in the `$DIR/ipopt/examples` directory. **If you see `error flag -53` when using SPRAL, then run**
 ```
 setenv('OMP_CANCELLATION','TRUE'); 
 setenv('OMP_PROC_BIND','TRUE');
 ```
-before using ipopt.
+in MATLAB before using IPOPT.
 
 <a id="mexw64"></a>
 ## Windows x86-64
-Tested with Windows 11 and MATLAB R2024b
 1) Set up the environment
 	- Install MSYS2 (In the following, MSYSDIR refers to the folder where MSYS2 is installed)
-	- Install toolchain and compilers (meson, ninja, and hwloc are only needed if you are compiling spral)
+	- Install toolchain and compilers (meson, ninja, and hwloc are only needed if you are compiling SPRAL)
 	```
 	pacman -S --needed binutils diffutils git grep make patch pkgconf
 	pacman -S --needed mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran
@@ -269,7 +258,7 @@ Tested with Windows 11 and MATLAB R2024b
     pacman -S --needed mingw-w64-x86_64-meson mingw-w64-x86_64-ninja mingw-w64-x86_64-hwloc
 	```	
 	- Restart MSYS2, make sure to launch the `MSYS2 MinGW x64` shortcut and **not** the `MSYS2 MSYS` app.
-	- Store current directory
+	- Set up directories
 	```
  	DIR=$(pwd)
  	export PREFIX=$DIR/install
@@ -312,54 +301,29 @@ meson install -C build
 	../configure --prefix="$PREFIX"
 	make install
 	```
-5) Compile Ipopt
-	- Get Ipopt code
-	```
- 	cd $DIR
-	git clone https://github.com/coin-or/Ipopt.git Ipopt_src
-	cd Ipopt_src
-	mkdir ./build
-	cd build
-    ```
-    - Configure IPOPT
-      - With no extra flags passed to the configure script, IPOPT will link with MUMPS if it is available and dynamically load `libhsl.dll` at runtime if it is available.
-      ```
-      ../configure --prefix="$PREFIX"
-      ```
-      - To enable SPRAL in addition to the above options, use
-      ```
-	  ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
-      ```
-      - To dynamically load `libmwma57.dll` (MA57 solver that ships with MATLAB) instead of `libhsl.dll`, use (add SPRAL flags from above if SPRAL is also needed)
-      ```
-      ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3"
-      ```
-	  **If you use this option, you need to point IPOPT to `libmwma57.dll` using (in your MATLAB script)**
-      ```
- 	  options.ipopt.linear_solver = 'ma57';
-      options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');
-      ```
-    - Make and install IPOPT
-	```
-	make install
-	```
-7) Manage dependencies on the target PC
-    - Move the compiled binaries from PREFIX to LIBDIR
-    ```
-    cd $DIR
-    mkdir $PKGDIR
-    mkdir $PKGDIR/lib
-    mv $PREFIX/bin/* $PKGDIR/lib
-    mv $LIBDIR/* $PKGDIR/lib
-    ```
-    - Automatically find and copy all MinGW-w64 dependencies
-    ```
-    for dll in $PKGDIR/lib/*.dll; do
-        ldd "$dll" | grep -i "/mingw64/bin" | awk '{print $3}' | while read -r dep_path; do
-            cp -n "$dep_path" "$PKGDIR/lib/"
-        done
-    done
-    ```
+5) Compile Ipopt (remove the SPRAL flags if not needed)
+```
+cd $DIR
+git clone https://github.com/coin-or/Ipopt.git Ipopt_src
+cd Ipopt_src
+mkdir ./build
+cd build
+../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
+make install
+```
+7) Make the package portable
+```
+cd $DIR
+mkdir $PKGDIR
+mkdir $PKGDIR/lib
+mv $PREFIX/bin/* $PKGDIR/lib
+mv $LIBDIR/* $PKGDIR/lib
+for dll in $PKGDIR/lib/*.dll; do
+	ldd "$dll" | grep -i "/mingw64/bin" | awk '{print $3}' | while read -r dep_path; do
+		cp -n "$dep_path" "$PKGDIR/lib/"
+	done
+done
+```
 7) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
@@ -382,12 +346,13 @@ setenv('OMP_CANCELLATION','TRUE');
 setenv('OMP_PROC_BIND','TRUE');
 ```
 
-Test your setup by running the examples in the `$DIR\install\examples` directory. In MATLAB, navigate to the `install` directory and run (do not forget to add `options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');` to `test_BartholomewBiggs` if you built IPOPT to use the `ma57` solver that ships with MATLAB.)
+Test your setup by running the examples in the `$DIR/ipopt/examples` directory. **If you see `error flag -53` when using SPRAL, then run**
 ```
-addpath(fullfile(pwd,'lib'));
-cd examples
-test_BartholomewBiggs
+setenv('OMP_CANCELLATION','TRUE'); 
+setenv('OMP_PROC_BIND','TRUE');
 ```
+in MATLAB before using IPOPT.
+
 <a id="mexa64"></a>
 # Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
@@ -406,24 +371,7 @@ mkdir install
 mkdir install/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 ```
-3) To compile a minimal statically linked IPOPT package, use the `-DFUNNY_MA57_FINT -O3` to enable the use of the `ma57` solver that ships with MATLAB and go to step 5
-```
-cd $DIR
-git clone https://github.com/coin-or/Ipopt.git
-cd Ipopt
-mkdir ./build
-cd build
-../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
-make install
-```
-**In your MATLAB script before calling the solver, point IPOPT to the `ma57` solver that ships with MATLAB.**
-```
-options.ipopt.linear_solver = 'ma57';
-options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'glnxa64', 'libmwma57.so');
-```
-If additional linear solvers (MUMPS, SPRAL, or HSL) are needed, then follow step 4, otherwise, go to step 5.
-
-4) Compile additional solvers (optional)
+3) Compile linear solvers (need atleast one)
     - Compile GKlib as a static library
     ```
     cd $DIR
@@ -464,7 +412,7 @@ If additional linear solvers (MUMPS, SPRAL, or HSL) are needed, then follow step
     meson install -C build
     cp build/libspral.a $LIBDIR/libspral.a
     ```
-    - Compile HSL
+    - Compile HSL as a static library.
       
 	    -- Get COIN-OR Tools project ThirdParty-HSL
 	    ```
@@ -480,17 +428,18 @@ If additional linear solvers (MUMPS, SPRAL, or HSL) are needed, then follow step
 	    ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared --with-metis-lflags="$LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-metis-cflags="-I$PREFIX/include"
 	    make install
 	    ```
-    - Compile Ipopt as a static library (the lapack flag is always needed and flags for linear solvers that you did not compile need to be removed)
-	```
- 	cd $DIR
-	git clone https://github.com/coin-or/Ipopt.git
-	cd Ipopt
-	mkdir ./build
-	cd build
-	../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
-	make install
-	```
-	If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
+
+4) Compile Ipopt as a static library (the lapack flag is always needed and flags for linear solvers that you did not compile need to be removed)
+```
+cd $DIR
+git clone https://github.com/coin-or/Ipopt.git
+cd Ipopt
+mkdir ./build
+cd build
+../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
+make install
+```
+If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 
 5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
