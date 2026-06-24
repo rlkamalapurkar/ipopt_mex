@@ -182,6 +182,9 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 	meson setup build --prefix="$PREFIX" --default-library=shared -Dlibblas=blas -Dliblapack=lapack -Dtests=false -Dexamples=false
 	meson compile -C build
 	meson install -C build
+ 	unset CC
+	unset CXX
+ 	unset FC
 	```
 	- HSL
 		- Get COIN-OR Tools project ThirdParty-HSL
