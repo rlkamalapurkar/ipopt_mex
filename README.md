@@ -198,15 +198,15 @@ meson install -C build
 	cd build
     ```
     - Configure IPOPT
-      - with MUMPS (if compiled) and dynamically loaded `libhsl.dll` at runtime (if available)
+      - With no extra flags passed to the configure script, IPOPT will link with MUMPS if it is available and dynamically loaded `libhsl.dll` at runtime if it is available.
       ```
       ../configure --prefix="$PREFIX"
       ```
-      - with MUMPS (if compiled), SPRAL and dynamically loaded `libhsl.dll` at runtime (if available)
+      - To enable SPRAL in addition to the above options, use
       ```
 	  ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
       ```
-      - with MUMPS (if compiled) and dynamically loaded `libmwma57.dll` (MA57 solver that ships with MATLAB) (add SPRAL flags from above if SPRAL is needed)
+      - To use dynamically loaded `libmwma57.dll` (MA57 solver that ships with MATLAB) instead of `libhsl.dll`, use (add SPRAL flags from above if SPRAL is also needed)
       ```
       ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3"
       ```
