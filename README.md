@@ -33,6 +33,7 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" LDFLAGS="-Wl,-rpath,@loader_path"
 make install
+brew unlink gcc
 ```
 2) Compile the mex file in MATLAB
 	- Make sure C and C++ compilers are set up in MATLAB using `mex -setup` and `mex -setup c++`.
@@ -240,6 +241,7 @@ for file in *.dylib *.mexmaca64; do
 	done
 	codesign --force --sign - "$file"
 done
+brew unlink gcc
 ```
 The complete toolbox with MUMPS, SPRAL, and HSL linear solvers should now be in the `$DIR/ipopt` folder. The toolbox should be portable to any MacOS arm64 computer. As long as the directory `$DIR/ipopt/lib` is on your MATLAB path, Ipopt should work.
 
