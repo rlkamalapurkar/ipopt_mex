@@ -144,7 +144,7 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 	DIR=$(pwd)
  	export PREFIX=$DIR/install
 	export LIBDIR=$PREFIX/lib
-    export PKGDIR=$PREFIX/ipopt
+    export PKGDIR=$DIR/ipopt
 	```
 	- Install toolchain and compilers (meson and ninja are only needed for SPRAL)
 	```
