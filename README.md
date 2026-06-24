@@ -2,17 +2,17 @@ This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MAT
 
 **Table of contents:**
 
-Minimal configuration with MA57 linear solver
+IPOPT with MATLAB's MA57 linear solver
  - [MacOS arm64](#mexmaca64min)
  - [Windows x86-64](#mexw64min)
  - [Linux x86-64](#mexa64min)
    
-IPOPT with additional linear solvers
+IPOPT with MUMPS, SPRAL, and HSL linear solvers
  - [MacOS arm64](#mexmaca64)
  - [Windows x86-64](#mexw64)
  - [Linux x86-64](#mexa64)
 
-# Minimal configuration with MA57 linear solver
+# IPOPT with MATLAB's MA57 linear solver
 This section shows how to use the `-DFUNNY_MA57_FINT` flag to compile IPOPT that dynamically loads (at runtime) the MA57 solver that is bundled with MATALB.
 <a id="mexmaca64min"></a>
 ## Macos arm64 (homebrew)
@@ -134,7 +134,7 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 ./matlab
 ```
 
-# IPOPT with additional linear solvers (MUMPS, SPRAL, and HSL)
+# IPOPT with MUMPS, SPRAL, and HSL linear solvers
 <a id="mexmaca64"></a>
 ## MacOS arm64
 
