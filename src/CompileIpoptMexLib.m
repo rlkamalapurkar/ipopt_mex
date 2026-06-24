@@ -47,11 +47,30 @@ elseif isunix
   IPOPT_HOME = '../../install';
   IPOPT_LIB = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
-  NAMES = {'ipopt','sipopt',...
-    'coinmumps','openblas','metis','GKlib',...
-    'coinhsl',... % Remove if hsl not available
-    'spral','hwloc',... % Remove if spral not available
-    'dl','MatlabDataArray','mx','mex','mat','m','gfortran','gomp'};
+  % NAMES = {'ipopt','sipopt',...
+  %   'coinmumps','openblas','metis','GKlib',...
+  %  'coinhsl',... % Remove if hsl not available
+  %  'spral','hwloc',... % Remove if spral not available
+  %  'dl','MatlabDataArray','mx','mex','mat','m','gfortran','gomp'};
+  NAMES = {'ipopt', 'sipopt'};
+  needs_metis = false;
+  if ~isempty(dir(fullfile(IPOPT_LIB, 'libcoinmumps.*')))
+    NAMES = [NAMES, {'coinmumps'}];
+    needs_metis = true;
+  end
+  if ~isempty(dir(fullfile(IPOPT_LIB, 'libcoinhsl.*')))
+    NAMES = [NAMES, {'coinhsl'}];
+    % ThirdParty-HSL typically links Metis if available
+    needs_metis = true; 
+  end
+  if ~isempty(dir(fullfile(IPOPT_LIB, 'libspral.*')))
+    NAMES = [NAMES, {'spral', 'hwloc'}];
+    needs_metis = true;
+  end
+  if needs_metis
+    NAMES = [NAMES, {'metis', 'GKlib'}];
+  end
+  NAMES = [NAMES, {'openblas', 'dl', 'MatlabDataArray', 'mx', 'mex', 'mat', 'm', 'gfortran', 'gomp'}];
   for lib=1:length(NAMES)
     LIBS = [ LIBS, ' -l', NAMES{lib} ];
   end
