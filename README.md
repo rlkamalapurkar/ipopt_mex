@@ -125,7 +125,6 @@ cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
 make install
 cd $PREFIX
-rm -rf bin include modules share
 ```
 2) Compile the mex file in MATLAB
 	- Make sure C and C++ compilers are set up in MATLAB using `mex -setup` and `mex -setup c++`.
@@ -142,7 +141,11 @@ cd /usr/local/MATLAB/R2025a/bin
 export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 ./matlab
 ```
-
+Remove files that are no longer needed (optional)
+```
+cd $PREFIX
+rm -rf bin include modules share
+```
 # IPOPT with MUMPS, SPRAL, and HSL linear solvers
 <a id="mexmaca64"></a>
 ## MacOS arm64
