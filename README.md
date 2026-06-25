@@ -450,8 +450,6 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
 make install
-cd $PREFIX
-rm -rf bin include modules share
 ```
 If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 
@@ -475,6 +473,11 @@ export LD_PRELOAD=$LD_PRELOAD:/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 export OMP_CANCELLATION=TRUE
 export OMP_PROC_BIND=TRUE
 ./matlab
+```
+Remove files that are no longer needed (optional)
+```
+cd $PREFIX
+rm -rf bin include modules share
 ```
 
 The complete toolbox with MUMPS, SPRAL, and HSL linear solvers (if compiled) should now be in `$DIR\ipopt`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\ipopt\lib` is on your MATLAB path, Ipopt should work.
