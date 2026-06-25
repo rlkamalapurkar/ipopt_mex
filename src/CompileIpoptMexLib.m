@@ -44,7 +44,7 @@ elseif ispc
   copyfile ..\lib ..\..\ipopt\lib
 elseif isunix
   % use ipopt precompiled with gcc
-  IPOPT_HOME = '../../install';
+  IPOPT_HOME = '../../ipopt';
   IPOPT_LIB = [IPOPT_HOME '/lib'];
   LIBS = [' -L' IPOPT_LIB ];
   NAMES = {'ipopt', 'sipopt'};
@@ -75,8 +75,8 @@ elseif isunix
     'LDFLAGS=''$LDFLAGS -static-libgcc -static-libstdc++ '...
     '-Wl,-rpath,\$ORIGIN,-rpath,$MATLABROOT/bin/$ARCH'' '...
     '-L$MATLABROOT/bin/$ARCH ' LIBS];
-  copyfile ../examples ../../install/examples
-  copyfile ../lib ../../install/lib
+  copyfile ../examples ../../ipopt/examples
+  copyfile ../lib ../../ipopt/lib
 else
   error('architecture not supported');
 end
