@@ -124,7 +124,6 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
 make install
-cd $PREFIX
 ```
 2) Compile the mex file in MATLAB
 	- Make sure C and C++ compilers are set up in MATLAB using `mex -setup` and `mex -setup c++`.
