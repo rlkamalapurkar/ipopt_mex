@@ -117,6 +117,7 @@ export INCLUDEDIR=$PREFIX/include/coin-or
 mkdir ipopt
 mkdir ipopt/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
+git clone https://github.com/rlkamalapurkar/ipopt_mex.git
 git clone https://github.com/coin-or/Ipopt.git ipopt_src
 cd ipopt_src
 mkdir ./build
