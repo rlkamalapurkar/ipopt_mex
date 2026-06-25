@@ -111,11 +111,11 @@ MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-
 ```
 sudo apt install gcc g++ gfortran git patch wget pkg-config libopenblas-dev make cmake
 DIR=$(pwd)
-export PREFIX=$DIR/install
+export PREFIX=$DIR/ipopt
 export LIBDIR=$PREFIX/lib
 export INCLUDEDIR=$PREFIX/include/coin-or
-mkdir install
-mkdir install/lib
+mkdir ipopt
+mkdir ipopt/lib
 cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 git clone https://github.com/coin-or/Ipopt.git ipopt_src
 cd ipopt_src
@@ -123,6 +123,8 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --disable-shared
 make install
+cd $PREFIX
+rm -rf bin include modules share
 ```
 2) Compile the mex file in MATLAB
 	- Make sure C and C++ compilers are set up in MATLAB using `mex -setup` and `mex -setup c++`.
@@ -371,11 +373,11 @@ MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-
 	- Set up directories and copy the static blas library to the install folder
 	```
 	DIR=$(pwd)
-	export PREFIX=$DIR/install
+	export PREFIX=$DIR/ipopt
 	export LIBDIR=$PREFIX/lib
 	export INCLUDEDIR=$PREFIX/include/coin-or
-	mkdir install
-	mkdir install/lib
+	mkdir ipopt
+	mkdir ipopt/lib
 	cp /usr/lib/x86_64-linux-gnu/libopenblas.a $LIBDIR/libopenblas.a
 	```
 2) Compile linear solvers (need atleast one)
@@ -445,6 +447,8 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
 make install
+cd $PREFIX
+rm -rf bin include modules share
 ```
 If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
 
@@ -470,4 +474,4 @@ export OMP_PROC_BIND=TRUE
 ./matlab
 ```
 
-The complete toolbox with MUMPS, SPRAL, and HSL linear solvers (if compiled) should now be in `$DIR\install`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\install\lib` is on your MATLAB path, Ipopt should work.
+The complete toolbox with MUMPS, SPRAL, and HSL linear solvers (if compiled) should now be in `$DIR\ipopt`. The toolbox should be portable to any Linux computer. As long as the directory `$DIR\ipopt\lib` is on your MATLAB path, Ipopt should work.
