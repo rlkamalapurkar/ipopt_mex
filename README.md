@@ -227,6 +227,15 @@ cd build
 ../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
 make install
 ```
+If you want to use MATLAB's built-in MA57 instead of HSL, configure using
+```
+../configure --prefix="$PREFIX" LDFLAGS="-Wl,-rpath,@loader_path" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$PREFIX/lib -lspral -L/opt/homebrew/lib -lmetis"
+```
+and use the IPOPT options
+```
+options.ipopt.linear_solver    = 'ma57';
+options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'maca64', 'libmwma57.dylib');
+```
 5) Compile the mex file
 	- Get modified Ipopt MATLAB interface
 	```
@@ -327,6 +336,15 @@ mkdir ./build
 cd build
 ../configure --prefix="$PREFIX" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
 make install
+```
+If you want to use MATLAB's built-in MA57 instead of HSL, use
+```
+../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="-L$LIBDIR -lspral -lhwloc -fopenmp -lmetis -llapack -lblas -lgfortran -lstdc++ -lm -lquadmath -lwinpthread"
+```
+and the ipopt options
+```
+options.ipopt.linear_solver    = 'ma57';
+options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');
 ```
 4) Make the package portable
 ```
@@ -451,7 +469,15 @@ cd build
 ../configure --prefix="$PREFIX" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-hsl-cflags="-I$INCLUDEDIR/hsl" --with-hsl-lflags="$LIBDIR/libcoinhsl.a $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
 make install
 ```
-If you run `make test`, the tests will fail since the tests themselves are not linked against `libcoinmumps.a`, but the mex file will be, so ignore the tests.
+If you want to use MATLAB's built-in MA57 library instead of HSL, use
+```
+../configure --prefix="$PREFIX" CXXFLAGS="-DFUNNY_MA57_FINT -O3" CFLAGS="-DFUNNY_MA57_FINT -O3" --with-lapack-lflags="$LIBDIR/libopenblas.a -lm" --with-mumps-cflags="-I$INCLUDEDIR/mumps" --with-mumps-lflags="$LIBDIR/libcoinmumps.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lm" --with-spral-cflags="-I$PREFIX/include" --with-spral-lflags="$LIBDIR/libspral.a -lhwloc -fopenmp $LIBDIR/libopenblas.a $LIBDIR/libmetis.a $LIBDIR/libGKlib.a -lgfortran -lstdc++ -lm" --disable-shared
+```
+and the ipopt options
+```
+options.ipopt.linear_solver = 'ma57';
+options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'glnxa64', 'libmwma57.so');
+```
 
 4) Compile the mex file
 	- Get modified Ipopt MATLAB interface
