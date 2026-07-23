@@ -1,6 +1,6 @@
-# IPOPT MATLAB interface with detailed compilation instructions
+# IPOPT_MEX
 
-This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface for Ipopt with **MUMPS**, **SPRAL**, and **HSL** linear solvers and detailed compilation instructions.
+Ipopt with **MUMPS**, **SPRAL**, and **HSL** linear solvers: detailed compilation instructions. This is a slightly modified copy of Enrico Bertolazzi and Peter Carbonetto's MATLAB interface.
 
 **Table of contents:**
 
