@@ -14,10 +14,10 @@ IPOPT with MUMPS, SPRAL, and HSL linear solvers
  - [Windows x86-64](#mexw64)
  - [Linux x86-64](#mexa64)
 
-# IPOPT with MATLAB's MA57 linear solver
+## IPOPT with MATLAB's MA57 linear solver
 This section shows how to use the `-DFUNNY_MA57_FINT` flag to compile IPOPT that dynamically loads (at runtime) the MA57 solver that is bundled with MATALB.
 <a id="mexmaca64min"></a>
-## Macos arm64 (homebrew)
+### Macos arm64 (homebrew)
 1) Set up the environment and compile IPOPT
 ```
 DIR=$(pwd)
@@ -60,7 +60,7 @@ options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'maca64', 'libmwma57.dylib');
 ```
 
 <a id="mexw64min"></a>
-## Windows x86-64 (MSYS2)
+### Windows x86-64 (MSYS2)
 1) Set up the environment
 	- Install MSYS2 (In the following, MSYSDIR refers to the folder where MSYS2 is installed)
 	- Install toolchain and compilers
@@ -107,7 +107,7 @@ options.ipopt.hsllib = fullfile(matlabroot, 'bin', 'win64', 'libmwma57.dll');
 ```
 
 <a id="mexa64min"></a>
-# Linux x86-64
+### Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Set up the toolchain and compile IPOPT
 ```
@@ -147,9 +147,9 @@ Remove files that are no longer needed (optional)
 cd $PREFIX
 rm -rf bin include modules share
 ```
-# IPOPT with MUMPS, SPRAL, and HSL linear solvers
+## IPOPT with MUMPS, SPRAL, and HSL linear solvers
 <a id="mexmaca64"></a>
-## MacOS arm64
+### MacOS arm64
 
 1) Set up environment
 	- Save current directory
@@ -274,7 +274,7 @@ setenv('OMP_PROC_BIND','TRUE');
 in MATLAB before using IPOPT.
 
 <a id="mexw64"></a>
-## Windows x86-64
+### Windows x86-64
 1) Set up the environment
 	- Install MSYS2 (In the following, MSYSDIR refers to the folder where MSYS2 is installed)
 	- Install toolchain and compilers (meson, ninja, and hwloc are only needed if you are compiling SPRAL)
@@ -385,7 +385,7 @@ setenv('OMP_PROC_BIND','TRUE');
 in MATLAB before using IPOPT.
 
 <a id="mexa64"></a>
-# Linux x86-64
+### Linux x86-64
 MATLAB on linux ships Intel MKL, which includes LAPACK. The MKL library uses 64-bit integers, but Ipopt expects 32-bit integers, which causes a segmentation fault. I could not figure out how to get dynamically linked Ipopt to use openblas instead of MKL, but statically linked Ipopt works.
 1) Set up the environment 
 	- Install the toolchain (hwloc, meson, and ninja are only needed for SPRAL)
